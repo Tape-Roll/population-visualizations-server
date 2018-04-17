@@ -8,6 +8,7 @@
         <g id='states'></g>
         <g id='counties'></g>
       </g>
+      <g id='key' class='key'></g>
     </svg>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -18,11 +19,24 @@
         if (err) {
           throw err;
         } else {
+          // First element is the lower bound, the last element is the upper
+          // bound. The ones in between are the steps where the color changes.
+          // Yes, the array needs to be this exact length for it to work :/
           var color = d3.scaleThreshold()
-            .domain(d3.range(2, 10))
-            .range(d3.schemeGreens[9])
+            .domain([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+            .range(d3.schemeSpectral[11].reverse())
+          // To rescale the key, rescale the colors, reset the key, and then
+          // rerender the key
           mapVisualization.renderKeyOnSVG("Test Statistic", color);
-          mapVisualization.renderUSOnSVG(geographyData, color);
+          mapVisualization.renderUSOnSVG(geographyData, color, function(stateId) {
+            return 8;
+          }, function(stateId) {
+            return new Promise(function(resolve, reject) {
+              return resolve(function(countyId) {
+                return 75
+              })
+            })
+          });
         }
       });
     </script>

@@ -1,15 +1,18 @@
 var mapVisualization = (function() {
     'use strict';
+    var currentZoomedInState
 
     var renderKeyOnSVG = function(statisticName, color) {
         var svg = d3.select("svg");
         var width = +svg.attr("width");
         var height = +svg.attr("height");
         var x = d3.scaleLinear()
-            .domain([1, 10])
+            .domain([1, 100])
             .rangeRound([600, 860]);
 
-        var g = svg.append("g")
+        var g = d3.select('.key')
+
+        g
             .attr("class", "key")
             .attr("transform", "translate(0,40)");
 
@@ -37,7 +40,7 @@ var mapVisualization = (function() {
 
         g.call(d3.axisBottom(x)
             .tickSize(13)
-            .tickFormat(function(x, i) { return i ? x : x + "%"; })
+            .tickFormat(function(x, i) { return x + "%"; })
             .tickValues(color.domain()))
             .select(".domain")
             .remove();
@@ -107,18 +110,20 @@ var mapVisualization = (function() {
         svg.transition().duration(750).attr('transform', d3.zoomTransform(selection.node()));
     }
 
-    var renderCountiesForStateOnSVG = function(stateId, geographyData, color, zoomOutCallback) {
+    var renderCountiesForStateOnSVG = function(stateId, geographyData, color, zoomOutCallback, countyDataFunction) {
         var svg = d3.select("#map-container");
         var counties = d3.select("#counties");
         var path = d3.geoPath();
-        var countiesForState = topojson.feature(geographyData, geographyData.objects.counties).features.filter(function(county) {return county.id.startsWith(stateId)})
+        var countiesForState = topojson.feature(geographyData,
+            geographyData.objects.counties).features.filter(function(county) {
+                return county.id.startsWith(stateId)})
         counties
             .attr("class", "counties")
             .attr("id", "counties")
             .selectAll("path")
             .data(countiesForState)
             .enter().append("path")
-                .attr("fill", function(d) { return color(8); })
+                .attr("fill", function(d) { return color(countyDataFunction(d.id)); })
                 .attr("d", path)
                 .attr("id", function(d) { return "path" + d.id; })
                 .on('click', function() {
@@ -128,14 +133,11 @@ var mapVisualization = (function() {
                 .text(function(d) { return d.rate + "%"; });
     }
 
-    var renderUSOnSVG = function(geographyData, color) {
+    var renderUSOnSVG = function(geographyData, color, dataFunction, getCountyDataFunction) {
         var svg = d3.select("#map-container");
         var states = d3.select("#states");
         var path = d3.geoPath();
-        var currentZoomedInState
-
-        var clickCallback = function(d) {
-        }
+        currentZoomedInState = null
 
         states
             .attr("class", "states")
@@ -143,7 +145,7 @@ var mapVisualization = (function() {
             .selectAll("path")
             .data(topojson.feature(geographyData, geographyData.objects.states).features)
             .enter().append("path")
-                .attr("fill", function(d) { return color(8); })
+                .attr("fill", function(d) { return color(dataFunction(d.id)); })
                 .attr("d", path)
                 .attr("id", function(d) { return "path" + d.id; })
                 .on('click', function(d) {
@@ -154,11 +156,14 @@ var mapVisualization = (function() {
                         }
                         zoomIntoState(d, svg)
                         currentZoomedInState = d;
-                        renderCountiesForStateOnSVG(d.id, geographyData, color, function() {
-                            resetNode('counties')
-                            zoomOut(d, svg);
-                            currentZoomedInState = null
-                        });
+                        getCountyDataFunction(d.id)
+                            .then(function(countyDataFunction) {
+                                renderCountiesForStateOnSVG(d.id, geographyData, color, function() {
+                                    resetNode('counties')
+                                    zoomOut(d, svg);
+                                    currentZoomedInState = null
+                                }, countyDataFunction);
+                            })
                     } else {
                         resetNode('counties')
                         zoomOut(d, svg);
@@ -166,15 +171,17 @@ var mapVisualization = (function() {
                     }
                 })
 
-        // svg.append("g")
-            // .attr("class", "states")
-            // .attr("id", "states")
-            // .selectAll("path")
-            // .data(topojson.feature(geographyData, geographyData.objects.states).features)
-            // .enter().append("path")
-                // .attr("d", path)
-                // .attr("id", function(d) { return "path" + d.id; })
     };
+
+    var recolorMap = function(pathDataFunction, color) {
+        d3.selectAll('path')
+            .attr("fill", function(d) { return color(pathDataFunction(d.id)); })
+    }
+
+    // Will be null if not zoomed in
+    var getCurrentlyZoomedInStateId = function() {
+        return currentZoomedInState.id
+    }
 
     var requestUSTopoJSON = function(callback) {
         d3.queue()
@@ -187,23 +194,12 @@ var mapVisualization = (function() {
         svg.html("");
     }
 
-    // var setZoomable = function() {
-        // var realSvg = d3.select("svg");
-        // var svg = d3.select("#map-container");
-        // // realSvg.call(d3.zoom().on('zoom', function() {
-            // // svg.attr('transform', d3.event.transform);
-        // // }));
-        // var states = d3.select('#states path');
-        // states.on('click', function(d) {
-            // d3.zoom().translateTo(d, 500, 500);
-        // })
-    // }
-
     return  {
         requestUSTopoJSON,
         renderUSOnSVG,
         renderKeyOnSVG,
         resetNode,
+        getCurrentlyZoomedInStateId
     };
 
 }())
