@@ -7,7 +7,7 @@ var mapVisualization = (function() {
         var width = +svg.attr("width");
         var height = +svg.attr("height");
         var x = d3.scaleLinear()
-            .domain([1, 100])
+            .domain([color.domain()[0], color.domain()[color.domain().length - 1]])
             .rangeRound([600, 860]);
 
         var g = d3.select('.key')
