@@ -43,28 +43,87 @@ var mapVisualization = (function() {
             .remove();
     };
 
-    var renderMapOnSVG = function(geographyData, color) {
-        var svg = d3.select("#map-container");
+    var centroid = function(points) {
+        // var averageX = 0;
+        // var averageY = 0;
+        // for (var i = 0; i < points.length; i++) {
+            // averageX += points[i][0] / points.length;
+            // averageY += points[i][1] / points.length;
+        // }
+        // return [averageX, averageY]
+        var minHeight = points[0][1];
+        var maxHeight = points[0][1];
+        var minWidth = points[0][0];
+        var maxWidth = points[0][0];
+        for (var i = 1; i < points.length; i++) {
+            minHeight = Math.min(minHeight, points[i][1])
+            maxHeight = Math.max(maxHeight, points[i][1])
+            minWidth = Math.min(minWidth, points[i][0])
+            maxWidth = Math.max(maxWidth, points[i][0])
+        }
+        var heightDifference = maxHeight - minHeight
+        var widthDifference = maxWidth - minWidth
+
+        return [(maxWidth + minWidth) / 2, (maxHeight + minHeight) / 2]
+    }
+
+    var stateScaleHeight = function(points) {
+        var minHeight = points[0][1];
+        var maxHeight = points[0][1];
+        var minWidth = points[0][0];
+        var maxWidth = points[0][0];
+        for (var i = 1; i < points.length; i++) {
+            minHeight = Math.min(minHeight, points[i][1])
+            maxHeight = Math.max(maxHeight, points[i][1])
+            minWidth = Math.min(minWidth, points[i][0])
+            maxWidth = Math.max(maxWidth, points[i][0])
+        }
+        var heightDifference = maxHeight - minHeight
+        var widthDifference = maxWidth - minWidth
+
+        return Math.min(960 / widthDifference, 600 / heightDifference) * .9
+    }
+
+    var zoomIntoState = function(d, svg) {
+        console.log(d)
         var width = +svg.attr("width");
         var height = +svg.attr("height");
+        var selection = svg.select('#path' + d.id);
+        var x = d.geometry.coordinates[0][0][0][0]
+        var y = d.geometry.coordinates[0][0][0][1]
+        var centroidCoords = centroid(d.geometry.coordinates[0][0])
+        d3.zoom().translateTo(selection, centroidCoords[0], centroidCoords[1]);
+        d3.zoom().scaleBy(selection, stateScaleHeight(d.geometry.coordinates[0][0]));
+        svg.transition().duration(750).attr('transform', d3.zoomTransform(selection.node()));
+    }
+
+    var renderUSOnSVG = function(geographyData, color) {
+        var svg = d3.select("#map-container");
         var path = d3.geoPath();
 
         svg.append("g")
-            .attr("class", "counties")
-            .selectAll("path")
-            .data(topojson.feature(geographyData, geographyData.objects.counties).features)
-            .enter().append("path")
-                .attr("fill", function(d) { return color(d.rate = 8); })
-                .attr("d", path)
-            .append("title")
-                .text(function(d) { return d.rate + "%"; });
-
-        svg.append("g")
             .attr("class", "states")
+            .attr("id", "states")
             .selectAll("path")
             .data(topojson.feature(geographyData, geographyData.objects.states).features)
             .enter().append("path")
+                .attr("fill", function(d) { return color(8); })
                 .attr("d", path)
+                .attr("id", function(d) { return "path" + d.id; })
+                .on('click', function(d) {
+                    zoomIntoState(d, svg)
+                })
+            .append("title")
+                .text(function(d) { return d.rate + "%"; });
+
+        // svg.append("g")
+            // .attr("class", "states")
+            // .attr("id", "states")
+            // .selectAll("path")
+            // .data(topojson.feature(geographyData, geographyData.objects.states).features)
+            // .enter().append("path")
+                // .attr("d", path)
+                // .attr("id", function(d) { return "path" + d.id; })
     };
 
     var requestUSTopoJSON = function(callback) {
@@ -81,14 +140,19 @@ var mapVisualization = (function() {
     var setZoomable = function() {
         var realSvg = d3.select("svg");
         var svg = d3.select("#map-container");
-        realSvg.call(d3.zoom().on('zoom', function() {
-            svg.attr('transform', d3.event.transform);
-        }));
+        // realSvg.call(d3.zoom().on('zoom', function() {
+            // svg.attr('transform', d3.event.transform);
+        // }));
+        var states = d3.select('#states path');
+        states.on('click', function(d) {
+            console.log('heyyyy')
+            d3.zoom().translateTo(d, 500, 500);
+        })
     }
 
     return  {
         requestUSTopoJSON,
-        renderMapOnSVG,
+        renderUSOnSVG,
         renderKeyOnSVG,
         resetSVG,
         setZoomable
