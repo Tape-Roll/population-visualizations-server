@@ -91,7 +91,8 @@ var mapVisualization = (function() {
         var height = +svg.attr("height");
         var selection = svg.select('#path' + d.id);
         var centerCoords = calculateCenter(d.geometry.coordinates)
-        selection.attr("opacity", '0')
+        d.prevFill = selection.attr('fill')
+        selection.attr("fill", 'none')
         d3.zoom().translateTo(selection, centerCoords[0], centerCoords[1]);
         d3.zoom().scaleBy(selection, stateScaleHeight(d.geometry.coordinates));
         svg.transition().duration(750).attr('transform', d3.zoomTransform(selection.node()));
@@ -99,7 +100,7 @@ var mapVisualization = (function() {
 
     var resetTransform = function(d, svg, color) {
         var selection = svg.select('#path' + d.id);
-        selection.attr("opacity", function(d) { return 1; })
+        selection.attr("fill", function(d) { return d.prevFill; })
         d3.zoom().translateTo(selection, 480, 300);
         d3.zoom().scaleBy(selection, 1 / stateScaleHeight(d.geometry.coordinates));
     }
@@ -148,6 +149,18 @@ var mapVisualization = (function() {
                 .attr("fill", function(d) { return color(dataFunction(d.id).value); })
                 .attr("d", path)
                 .attr("id", function(d) { return "path" + d.id; })
+                .on('mouseover', function(d) {
+                    var selection = svg.select('#path' + d.id)
+                    var node = selection.node()
+                    var parentNode = node.parentNode
+                    parentNode.appendChild(node);
+                    selection.attr('filter', 'drop-shadow(0px 0px 10px)');
+                })
+                .on('mouseout', function(d) {
+                    console.log('hello')
+                    var selection = svg.select('#path' + d.id)
+                    selection.attr('filter', null);
+                })
                 .on('click', function(d) {
                     if (!currentZoomedInState || currentZoomedInState.id !== d.id) {
                         if (currentZoomedInState) {

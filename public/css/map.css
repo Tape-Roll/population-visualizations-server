@@ -9,4 +9,5 @@
   fill: none;
   stroke: #DDD;
   stroke-linejoin: round;
+  cursor: pointer;
 }
