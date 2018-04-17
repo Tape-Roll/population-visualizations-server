@@ -11,7 +11,6 @@
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <script src="javascript/mapVisualization.js"></script>
     <script>
-      mapVisualization.setZoomable();
       mapVisualization.requestUSTopoJSON(function(err, geographyData) {
         if (err) {
           throw err;

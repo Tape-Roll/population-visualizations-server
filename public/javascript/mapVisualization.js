@@ -43,43 +43,39 @@ var mapVisualization = (function() {
             .remove();
     };
 
-    var centroid = function(points) {
-        // var averageX = 0;
-        // var averageY = 0;
-        // for (var i = 0; i < points.length; i++) {
-            // averageX += points[i][0] / points.length;
-            // averageY += points[i][1] / points.length;
-        // }
-        // return [averageX, averageY]
-        var minHeight = points[0][1];
-        var maxHeight = points[0][1];
-        var minWidth = points[0][0];
-        var maxWidth = points[0][0];
-        for (var i = 1; i < points.length; i++) {
-            minHeight = Math.min(minHeight, points[i][1])
-            maxHeight = Math.max(maxHeight, points[i][1])
-            minWidth = Math.min(minWidth, points[i][0])
-            maxWidth = Math.max(maxWidth, points[i][0])
+    var calculateStateBounds = function(points) {
+        var minHeight = points[0][0][0][1];
+        var maxHeight = points[0][0][0][1];
+        var minWidth = points[0][0][0][0];
+        var maxWidth = points[0][0][0][0];
+        for (var i = 0; i < points.length; i++) {
+            for (var j = 0; j < points[i].length; j++) {
+                for (var k = 1; k < points[i][j].length; k++) {
+                    minHeight = Math.min(minHeight, points[i][j][k][1])
+                    maxHeight = Math.max(maxHeight, points[i][j][k][1])
+                    minWidth = Math.min(minWidth, points[i][j][k][0])
+                    maxWidth = Math.max(maxWidth, points[i][j][k][0])
+                }
+            }
         }
-        var heightDifference = maxHeight - minHeight
-        var widthDifference = maxWidth - minWidth
+        return {
+            minHeight,
+            maxHeight,
+            minWidth,
+            maxWidth
+        }
+    }
 
-        return [(maxWidth + minWidth) / 2, (maxHeight + minHeight) / 2]
+    var calculateCenter = function(points) {
+        var stateBounds = calculateStateBounds(points);
+
+        return [(stateBounds.maxWidth + stateBounds.minWidth) / 2, (stateBounds.maxHeight + stateBounds.minHeight) / 2]
     }
 
     var stateScaleHeight = function(points) {
-        var minHeight = points[0][1];
-        var maxHeight = points[0][1];
-        var minWidth = points[0][0];
-        var maxWidth = points[0][0];
-        for (var i = 1; i < points.length; i++) {
-            minHeight = Math.min(minHeight, points[i][1])
-            maxHeight = Math.max(maxHeight, points[i][1])
-            minWidth = Math.min(minWidth, points[i][0])
-            maxWidth = Math.max(maxWidth, points[i][0])
-        }
-        var heightDifference = maxHeight - minHeight
-        var widthDifference = maxWidth - minWidth
+        var stateBounds = calculateStateBounds(points);
+        var heightDifference = stateBounds.maxHeight - stateBounds.minHeight
+        var widthDifference = stateBounds.maxWidth - stateBounds.minWidth
 
         return Math.min(960 / widthDifference, 600 / heightDifference) * .9
     }
@@ -89,18 +85,16 @@ var mapVisualization = (function() {
         var width = +svg.attr("width");
         var height = +svg.attr("height");
         var selection = svg.select('#path' + d.id);
-        var x = d.geometry.coordinates[0][0][0][0]
-        var y = d.geometry.coordinates[0][0][0][1]
-        var centroidCoords = centroid(d.geometry.coordinates[0][0])
-        d3.zoom().translateTo(selection, centroidCoords[0], centroidCoords[1]);
-        d3.zoom().scaleBy(selection, stateScaleHeight(d.geometry.coordinates[0][0]));
+        var centerCoords = calculateCenter(d.geometry.coordinates)
+        d3.zoom().translateTo(selection, centerCoords[0], centerCoords[1]);
+        d3.zoom().scaleBy(selection, stateScaleHeight(d.geometry.coordinates));
         svg.transition().duration(750).attr('transform', d3.zoomTransform(selection.node()));
     }
 
     var resetTransform = function(d, svg) {
         var selection = svg.select('#path' + d.id);
         d3.zoom().translateTo(selection, 480, 300);
-        d3.zoom().scaleBy(selection, 1 / stateScaleHeight(d.geometry.coordinates[0][0]));
+        d3.zoom().scaleBy(selection, 1 / stateScaleHeight(d.geometry.coordinates));
     }
 
     var zoomOut = function(d, svg) {
@@ -159,25 +153,23 @@ var mapVisualization = (function() {
         svg.html("");
     }
 
-    var setZoomable = function() {
-        var realSvg = d3.select("svg");
-        var svg = d3.select("#map-container");
-        // realSvg.call(d3.zoom().on('zoom', function() {
-            // svg.attr('transform', d3.event.transform);
-        // }));
-        var states = d3.select('#states path');
-        states.on('click', function(d) {
-            console.log('heyyyy')
-            d3.zoom().translateTo(d, 500, 500);
-        })
-    }
+    // var setZoomable = function() {
+        // var realSvg = d3.select("svg");
+        // var svg = d3.select("#map-container");
+        // // realSvg.call(d3.zoom().on('zoom', function() {
+            // // svg.attr('transform', d3.event.transform);
+        // // }));
+        // var states = d3.select('#states path');
+        // states.on('click', function(d) {
+            // d3.zoom().translateTo(d, 500, 500);
+        // })
+    // }
 
     return  {
         requestUSTopoJSON,
         renderUSOnSVG,
         renderKeyOnSVG,
         resetSVG,
-        setZoomable
     };
 
 }())
