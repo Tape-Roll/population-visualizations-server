@@ -4,7 +4,10 @@
   </head>
   <body>
     <svg width="960" height="600">
-      <g id='map-container'></g>
+      <g id='map-container'>
+        <g id='states'></g>
+        <g id='counties'></g>
+      </g>
     </svg>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -17,7 +20,7 @@
         } else {
           var color = d3.scaleThreshold()
             .domain(d3.range(2, 10))
-            .range(d3.schemeReds[9])
+            .range(d3.schemeGreens[9])
           mapVisualization.renderKeyOnSVG("Test Statistic", color);
           mapVisualization.renderUSOnSVG(geographyData, color);
         }
