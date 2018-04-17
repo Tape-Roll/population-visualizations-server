@@ -123,14 +123,14 @@ var mapVisualization = (function() {
             .selectAll("path")
             .data(countiesForState)
             .enter().append("path")
-                .attr("fill", function(d) { return color(countyDataFunction(d.id)); })
+                .attr("fill", function(d) { return color(countyDataFunction(d.id).value); })
                 .attr("d", path)
                 .attr("id", function(d) { return "path" + d.id; })
                 .on('click', function() {
                     zoomOutCallback();
                 })
             .append("title")
-                .text(function(d) { return d.rate + "%"; });
+                .text(function(d) { return countyDataFunction(d.id).name + ": " + countyDataFunction(d.id).value + "%"; });
     }
 
     var renderUSOnSVG = function(geographyData, color, dataFunction, getCountyDataFunction) {
@@ -145,7 +145,7 @@ var mapVisualization = (function() {
             .selectAll("path")
             .data(topojson.feature(geographyData, geographyData.objects.states).features)
             .enter().append("path")
-                .attr("fill", function(d) { return color(dataFunction(d.id)); })
+                .attr("fill", function(d) { return color(dataFunction(d.id).value); })
                 .attr("d", path)
                 .attr("id", function(d) { return "path" + d.id; })
                 .on('click', function(d) {
@@ -170,6 +170,8 @@ var mapVisualization = (function() {
                         currentZoomedInState = null
                     }
                 })
+            .append("title")
+                .text(function(d) { return dataFunction(d.id).name + ": " + dataFunction(d.id).value + "%"; });
 
     };
 

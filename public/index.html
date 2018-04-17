@@ -29,11 +29,17 @@
           // rerender the key
           mapVisualization.renderKeyOnSVG("Test Statistic", color);
           mapVisualization.renderUSOnSVG(geographyData, color, function(stateId) {
-            return 8;
+            return {
+              value: 4,
+              name: 'state'
+            }
           }, function(stateId) {
             return new Promise(function(resolve, reject) {
               return resolve(function(countyId) {
-                return 75
+                return {
+                  value: 75,
+                  name: 'county'
+                }
               })
             })
           });
