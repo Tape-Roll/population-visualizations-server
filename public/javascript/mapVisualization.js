@@ -97,17 +97,22 @@ var mapVisualization = (function() {
         svg.transition().duration(750).attr('transform', d3.zoomTransform(selection.node()));
     }
 
-    var zoomOut = function(d, svg) {
+    var resetTransform = function(d, svg) {
         var selection = svg.select('#path' + d.id);
         d3.zoom().translateTo(selection, 480, 300);
         d3.zoom().scaleBy(selection, 1 / stateScaleHeight(d.geometry.coordinates[0][0]));
+    }
+
+    var zoomOut = function(d, svg) {
+        resetTransform(d, svg)
+        var selection = svg.select('#path' + d.id);
         svg.transition().duration(750).attr('transform', d3.zoomTransform(selection.node()));
     }
 
     var renderUSOnSVG = function(geographyData, color) {
         var svg = d3.select("#map-container");
         var path = d3.geoPath();
-        var currentZoomedInStateId
+        var currentZoomedInState
 
         svg.append("g")
             .attr("class", "states")
@@ -119,12 +124,15 @@ var mapVisualization = (function() {
                 .attr("d", path)
                 .attr("id", function(d) { return "path" + d.id; })
                 .on('click', function(d) {
-                    if (currentZoomedInStateId !== d.id) {
+                    if (!currentZoomedInState || currentZoomedInState.id !== d.id) {
+                        if (currentZoomedInState) {
+                            resetTransform(currentZoomedInState, svg)
+                        }
                         zoomIntoState(d, svg)
-                        currentZoomedInStateId = d.id;
+                        currentZoomedInState = d;
                     } else {
                         zoomOut(d, svg);
-                        currentZoomedInStateId = null
+                        currentZoomedInState = null
                     }
                 })
             .append("title")
