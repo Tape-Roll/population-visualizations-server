@@ -9,3 +9,9 @@ States on a chloropleth map.
 npm i
 npm start
 ```
+
+If running on the production server, also do:
+```bash
+source ./.env
+```
+That file is not in this repo though for reasons
