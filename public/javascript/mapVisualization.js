@@ -127,7 +127,7 @@ var mapVisualization = (function() {
                 .attr("fill", function(d) { return color(countyDataFunction(d.id).value); })
                 .attr("d", path)
                 .attr("id", function(d) { return "path" + d.id; })
-                .on('click', function() {
+                .on('dblclick', function() {
                     zoomOutCallback();
                 })
             .append("title")
