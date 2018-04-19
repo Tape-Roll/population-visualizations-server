@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const api = require("./routes/api");
 
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost/population");
+mongoose.connect("mongodb://127.0.0.1/population");
 
 const app = express();
 

@@ -1,21 +1,32 @@
 <html>
-  <head>
-    <link rel='stylesheet' type='text/css' href='css/map.css'>
-  </head>
-  <body>
-    <svg width="960" height="600">
-      <g id='map-container'>
-        <g id='counties'></g>
-        <g id='states'></g>
-      </g>
-      <g id='key' class='key'></g>
-    </svg>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://d3js.org/topojson.v2.min.js"></script>
-    <script src="javascript/mapVisualization.js"></script>
-    <script>
-      mapVisualization.requestUSTopoJSON(function(err, geographyData) {
+
+<head>
+  <link rel='stylesheet' type='text/css' href='css/map.css'>
+</head>
+
+<body>
+  <svg width="960" height="600">
+    <g id='map-container'>
+      <g id='counties'></g>
+      <g id='states'></g>
+    </g>
+    <g id='key' class='key'></g>
+  </svg>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <script src="javascript/mapVisualization.js"></script>
+  <script>
+
+    var states = {};
+    loadStates().then(function (stateArray) {
+      stateArray.forEach(element => {
+        element.value = 1;
+        states[element.state_id] = element;
+      });
+      console.log(states);
+      mapVisualization.requestUSTopoJSON(function (err, geographyData) {
         if (err) {
           throw err;
         } else {
@@ -28,14 +39,14 @@
           // To rescale the key, rescale the colors, reset the key, and then
           // rerender the key
           mapVisualization.renderKeyOnSVG("Test Statistic", color);
-          mapVisualization.renderUSOnSVG(geographyData, color, function(stateId) {
-            return {
-              value: 4,
-              name: 'state'
-            }
-          }, function(stateId) {
-            return new Promise(function(resolve, reject) {
-              return resolve(function(countyId) {
+          mapVisualization.renderUSOnSVG(geographyData, color, function (stateId) {
+            // Getting state info
+            console.log(stateId)
+            return states[parseInt(stateId)];
+          }, function (stateId) {
+            return new Promise(function (resolve, reject) {
+              // Getting county info
+              return resolve(function (countyId) {
                 return {
                   value: 75,
                   name: 'county'
@@ -45,6 +56,9 @@
           });
         }
       });
-    </script>
-  </body>
+    });
+
+  </script>
+</body>
+
 </html>
