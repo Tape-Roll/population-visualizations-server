@@ -14,7 +14,7 @@ const stateSchema = mongoose.Schema({
 });
 
 stateSchema.statics.stateWithId = function(id, cb) {
-    let projection = { _id: 0, "counties.county_id": 1 };
+    let projection = { _id: 0, "counties.county_id": 1, "counties.name": 1 };
 
     addYearProjections(projection, "counties.years.");
 

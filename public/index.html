@@ -1,79 +1,54 @@
 <html>
 
 <head>
-  <link rel='stylesheet' type='text/css' href='css/map.css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel='stylesheet' type='text/css' href='css/map.css'>
 </head>
 
 <body>
-  <svg width="960" height="600">
-    <g id='map-container'>
-      <g id='counties'></g>
-      <g id='states'></g>
-    </g>
-    <g id='key' class='key'></g>
-  </svg>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-  <script src="https://d3js.org/topojson.v2.min.js"></script>
-  <script src="javascript/mapVisualization.js"></script>
-  <script src="javascript/data_retriever.js"></script>
-  <script>
-
-    // Load data for states right at the beginning
-    loadStates().then(function (stateArray) {
-      var states = {};
-      var totalPopulation = 0;
-      stateArray.forEach(function (element) {
-        var pop = parseInt(element.years["2016"].statisticsTable.total_pop);
-        totalPopulation += pop;
-        element.value = pop;
-        states[element.state_id] = element;
-      });
-      Object.keys(states).forEach(function (key) {
-        states[key].value /= (totalPopulation / 100);
-      });
-
-      // Setup map
-      mapVisualization.requestUSTopoJSON(function (err, geographyData) {
-        if (err) {
-          throw err;
-        } else {
-          // First element is the lower bound, the last element is the upper
-          // bound. The ones in between are the steps where the color changes.
-          // Yes, the array needs to be this exact length for it to work :/
-          var color = d3.scaleThreshold()
-            .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-            .range(d3.schemeSpectral[11].reverse())
-          // To rescale the key, rescale the colors, reset the key, and then
-          // rerender the key
-          mapVisualization.renderKeyOnSVG("Test Statistic", color);
-          mapVisualization.renderUSOnSVG(geographyData, color, function (stateId) {
-            // Getting state info
-            return states[parseInt(stateId)];
-          }, function (stateId) {
-            return new Promise(function (resolve, reject) {
-              return loadCounties(stateId).then(function (counts) {
-                // Getting county info
-                var counties = {};
-                counts.forEach(element => {
-                  counties[element.county_id] = element;
-                });
-                console.log(counties);
-                return resolve(function (countyId) {
-                  return {
-                    value: 75,
-                    name: 'county'
-                  }
-                })
-              });
-            })
-          });
-        }
-      });
-    });
-
-  </script>
+    <div class="cont">
+        <div class="filter-cont">
+            <div class="filter-div"></div>
+        </div>
+        <div class="side-bar-cont">
+            <div class="side-bar"></div>
+        </div>
+        <div class="map-div">
+            <div class="map-cont">
+                <svg>
+                    <g id='map-container'>
+                        <g id='counties'></g>
+                        <g id='states'></g>
+                    </g>
+                    <g id='key' class='key'></g>
+                </svg>
+            </div>
+        </div>
+        <div class="time-cont">
+            <div class="slider-div bg-dark text-light">
+                <div class="btn btn-info play-button">Play</div>
+                <input id="slider" type="range" min="2009" max="2016" step="1" value="2016" />
+                <span class="year-label">2016</span>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js"></script>
+<script src="javascript/mapVisualization.js"></script>
+<script src="javascript/data_retriever.js"></script>
+<script src="javascript/data_slider.js"></script>
+<script src="javascript/main.js"></script>
 </body>
 
 </html>
