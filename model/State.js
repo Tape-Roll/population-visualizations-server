@@ -13,15 +13,31 @@ const stateSchema = mongoose.Schema({
     ]
 });
 
+stateSchema.statics.stateWithId = function(id, cb) {
+    let projection = { _id: 0, "counties.county_id": 1 };
+
+    addYearProjections(projection, "counties.years.");
+
+    return this.findOne({ state_id: id }, projection, cb);
+};
+
 stateSchema.statics.allStates = function(cb) {
     // Stat_id < 1000000 because this also finds counties for some reason
-    lowYear = 2009;
-    highYear = 2016;
+
     let projection = { _id: 0, state_id: 1, name: 1 };
-    for (let i = lowYear; i <= highYear; i++) {
-        projection[`years.${i}.statisticsTable.total_age`] = 1;
-    }
+
+    addYearProjections(projection);
+
     return this.find({}, projection, cb);
 };
+
+function addYearProjections(obj, pre = "years.", post = ".statisticsTable.total_pop") {
+    lowYear = 2009;
+    highYear = 2016;
+    for (let i = lowYear; i <= highYear; i++) {
+        obj[`${pre}${i}${post}`] = 1;
+    }
+    return obj;
+}
 
 module.exports = mongoose.model("State", stateSchema);

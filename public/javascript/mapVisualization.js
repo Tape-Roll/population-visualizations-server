@@ -1,25 +1,4 @@
 "use strict";
-
-var loadStates = function() {
-    return new Promise(function(resolve, reject) {
-        axios
-            .post("/api/all_states", {})
-            .then(function(res) {
-                res = res.data;
-                if (res.error) {
-                    console.log(res.error);
-                    reject();
-                } else {
-                    resolve(res.states);
-                }
-            })
-            .catch(function(err) {
-                console.log(err);
-                reject();
-            });
-    });
-};
-
 var mapVisualization = (function() {
     var currentZoomedInState;
 
@@ -210,7 +189,6 @@ var mapVisualization = (function() {
             .enter()
             .append("path")
             .attr("fill", function(d) {
-                console.log(dataFunction(d.id));
                 return color(dataFunction(d.id).value);
             })
             .attr("d", path)
