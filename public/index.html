@@ -17,6 +17,7 @@
   <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
   <script src="https://d3js.org/topojson.v2.min.js"></script>
   <script src="javascript/mapVisualization.js"></script>
+  <script src="javascript/data_retriever.js"></script>
   <script>
 
     // Load data for states right at the beginning
@@ -31,7 +32,6 @@
       });
       Object.keys(states).forEach(function (key) {
         states[key].value /= (totalPopulation / 100);
-        console.log(states[key].value, totalPopulation);
       });
 
       // Setup map
