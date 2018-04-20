@@ -255,13 +255,16 @@ var mapVisualization = (function() {
         d3
             .selectAll("path")
             .attr("fill", function(d) {
-                return colorPath(pathDataFunction, d, stateColor);
-            })
-            .style("opacity", function(d) {
                 if (currentZoomedInState !== null && currentZoomedInState.id === d.id) {
-                    return 0;
+                    return 'none'
+                } else {
+                    return colorPath(pathDataFunction, d, stateColor);
                 }
-                return 1;
+            })
+            .select("title")
+            .text(function(d) {
+                var str = pathDataFunction(d.id).name + ": " + pathDataFunction(d.id).value;
+                return mouseoverFormatter(str, d);
             });
     };
 
