@@ -252,17 +252,9 @@ var mapVisualization = (function() {
     };
 
     var recolorMap = function(pathDataFunction) {
-        d3
-            .selectAll("path")
-            .attr("fill", function(d) {
-                return colorPath(pathDataFunction, d, stateColor);
-            })
-            .style("opacity", function(d) {
-                if (currentZoomedInState !== null && d.id === currentZoomedInState.id) {
-                    return 0;
-                }
-                return 1;
-            });
+        d3.selectAll("path").attr("fill", function(d) {
+            return colorPath(pathDataFunction, d, stateColor);
+        });
     };
 
     var colorPath = function(dataFunction, d, color) {
