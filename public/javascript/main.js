@@ -4,8 +4,9 @@ function MapController() {
     this.states = {};
     this.counties = {};
     this.filter = {
-        shouldFindPercentage: true,
-        statName: "total_pop"
+        shouldFindPercentage: false,
+        statName: "moved_county.age.1 to 4 years"
+        //statName: "median_age"
     };
     this.currYear = 2016;
     this.maxStateValue = 0;
@@ -93,7 +94,6 @@ function MapController() {
     this.updateMap = function() {
         mapVisualization.setMouseoverFormatterPercent(this.filter.shouldFindPercentage);
 
-        // Area id can be for a state or county
         this.findStateValues();
         this.findCountyValues();
 
@@ -116,6 +116,7 @@ function MapController() {
                 var ret = this.getState(id);
                 if (ret === undefined) {
                     ret = this.getCounty(id);
+                } else {
                 }
 
                 return ret;
@@ -147,9 +148,7 @@ function MapController() {
             console.log(stateArray);
             stateArray.forEach(
                 function(element) {
-                    var value = parseInt(
-                        element.years[this.currYear].statisticsTable[this.filter.statName]
-                    );
+                    var value = parseInt(this.findValue(element));
                     element.value = value;
                     this.states[element.state_id] = element;
                     total += value;
@@ -166,11 +165,7 @@ function MapController() {
                     if (this.getState(key).years[this.currYear] === undefined) {
                         value = -1;
                     } else {
-                        value = parseInt(
-                            this.getState(key).years[this.currYear].statisticsTable[
-                                this.filter.statName
-                            ]
-                        );
+                        value = parseInt(this.findValue(this.getState(key)));
                     }
                     this.getState(key).value = value;
                     total += value;
@@ -206,14 +201,12 @@ function MapController() {
                 countyArray.forEach(
                     function(element) {
                         this.counties[element.county_id] = element;
-                        var pop = parseInt(
-                            element.years[this.currYear].statisticsTable[this.filter.statName]
-                        );
+                        var pop = parseInt(this.findValue(element));
                         element.value = pop;
                         total += pop;
                         if (pop >= 0) {
-                            this.minStateValue = Math.min(pop, this.minStateValue);
-                            this.maxStateValue = Math.max(pop, this.maxStateValue);
+                            this.minCountyValue = Math.min(pop, this.minCountyValue);
+                            this.maxCountyValue = Math.max(pop, this.maxCountyValue);
                         }
                     }.bind(this)
                 );
@@ -227,17 +220,13 @@ function MapController() {
                     if (this.getCounty(key).years[this.currYear] === undefined) {
                         value = -1;
                     } else {
-                        value = parseInt(
-                            this.getCounty(key).years[this.currYear].statisticsTable[
-                                this.filter.statName
-                            ]
-                        );
+                        value = parseInt(this.findValue(this.getCounty(key)));
                     }
                     this.getCounty(key).value = value;
                     total += value;
                     if (value >= 0) {
-                        this.minStateValue = Math.min(value, this.minStateValue);
-                        this.maxStateValue = Math.max(value, this.maxStateValue);
+                        this.minCountyValue = Math.min(value, this.minCountyValue);
+                        this.maxCountyValue = Math.max(value, this.maxCountyValue);
                     }
                 }.bind(this)
             );
@@ -262,6 +251,17 @@ function MapController() {
                 }.bind(this)
             );
         }
+    };
+
+    this.findValue = function(obj) {
+        var table = obj.years[this.currYear].statisticsTable;
+        keys = this.filter.statName.split(".");
+        keys.forEach(
+            function(element) {
+                table = table[element];
+            }.bind(this)
+        );
+        return table;
     };
 }
 
