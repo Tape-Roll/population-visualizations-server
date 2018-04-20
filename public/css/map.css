@@ -45,7 +45,7 @@
 }
 
 .side-bar {
-    background: blue;
+    padding: 10px 30px;
     width: 15vw;
     height: 80vh;
     margin-left: 20px;
@@ -111,4 +111,8 @@ svg {
     height: 100%;
     width: 100%;
     z-index: 0;
+}
+
+.side-bar td {
+  margin: 10px;
 }
