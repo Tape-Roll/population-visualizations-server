@@ -9,10 +9,10 @@
 
 */
 
-var loadStates = function() {
+var loadStates = function(stat) {
     return new Promise(function(resolve, reject) {
         axios
-            .post("/api/all_states", {})
+            .post("/api/all_states", { requestedStat: stat })
             .then(function(res) {
                 res = res.data;
                 if (res.error) {
@@ -29,10 +29,10 @@ var loadStates = function() {
     });
 };
 
-var loadCounties = function(stateId) {
+var loadCounties = function(stateId, stat) {
     return new Promise(function(resolve, reject) {
         axios
-            .post("/api/state/" + stateId, {})
+            .post("/api/state/" + stateId, { requestedStat: stat })
             .then(function(res) {
                 console.log(res);
                 res = res.data;
