@@ -252,13 +252,20 @@ var mapVisualization = (function() {
     };
 
     var recolorMap = function(pathDataFunction) {
-        d3.selectAll("path").attr("fill", function(d) {
-            return colorPath(pathDataFunction, d, stateColor);
-        });
+        d3
+            .selectAll("path")
+            .attr("fill", function(d) {
+                return colorPath(pathDataFunction, d, stateColor);
+            })
+            .style("opacity", function(d) {
+                if (currentZoomedInState !== null && d.id === currentZoomedInState.id) {
+                    return 0;
+                }
+                return 1;
+            });
     };
 
     var colorPath = function(dataFunction, d, color) {
-        console.log(color);
         var value = dataFunction(d.id).value;
         if (value < 0) {
             return badDataColor;

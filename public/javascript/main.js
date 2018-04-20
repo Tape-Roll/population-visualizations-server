@@ -115,7 +115,6 @@ function MapController() {
             function(id) {
                 var ret = this.getState(id);
                 if (ret === undefined) {
-                    console.log("State undefined: " + id + ", year: " + this.currYear);
                     ret = this.getCounty(id);
                 }
 
@@ -132,6 +131,7 @@ function MapController() {
     this.getCounty = function(id) {
         id = parseInt(id);
         if (this.counties[id] === undefined || this.counties[id].value === undefined) {
+            console.log("Missing county: ", this.counties);
             // Uh oh. The county isn't found or set up right
             return { name: "unknown", value: -1 };
         }
@@ -198,7 +198,6 @@ function MapController() {
     };
 
     this.findCountyValues = function(countyArray) {
-        this.counties = {};
         this.maxCountyValue = 0;
         this.minCountyValue = 10000000000;
         var total = 0;
