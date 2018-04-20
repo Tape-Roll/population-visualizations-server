@@ -9,6 +9,8 @@ function MapController() {
     this.minStatePop = 100;
     this.maxCountyPop = 0;
     this.minCountyPop = 100;
+    this.leftColor = "yellow";
+    this.rightColor = "red";
     this.init = function() {
         // Load data for states right at the beginning
         loadStates().then(
@@ -26,12 +28,12 @@ function MapController() {
                             // Yes, the array needs to be this exact length for it to work :/
                             var scale = this.getScale();
                             this.color = d3
-                                .scaleThreshold()
-                                .domain(scale)
-                                .range(d3.schemeSpectral[11].reverse());
+                                .scaleLinear()
+                                .domain([this.minStatePop, this.maxStatePop])
+                                .range([this.leftColor, this.rightColor]);
                             // To rescale the key, rescale the colors, reset the key, and then
                             // rerender the key
-                            mapVisualization.renderKeyOnSVG("Test Statistic", this.color);
+                            //mapVisualization.renderKeyOnSVG("Test Statistic", this.color);
                             mapVisualization.renderUSOnSVG(
                                 geographyData,
                                 this.color,
@@ -120,9 +122,9 @@ function MapController() {
 
         var scale = this.getScale();
         this.color = d3
-            .scaleThreshold()
-            .domain(scale)
-            .range(d3.schemeSpectral[11]);
+            .scaleLinear()
+            .domain([this.minStatePop, this.maxStatePop])
+            .range([this.leftColor, this.rightColor]);
 
         this.findStateValues();
         mapVisualization.recolorMap(
