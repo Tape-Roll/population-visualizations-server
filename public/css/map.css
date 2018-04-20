@@ -20,11 +20,14 @@
 
 .filter-div {
     padding: 10px 30px;
-    width: calc(80% - 40px);
 }
 
 .dropdown {
     display: inline;
+}
+
+#clear-button {
+    margin-left: 80px;
 }
 
 .dropdown-item {
