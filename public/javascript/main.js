@@ -4,11 +4,10 @@ function MapController() {
     this.states = {};
     this.counties = {};
     this.filter = {
-        shouldFindPercentage: false,
-        statName: "median_age"
+        shouldFindPercentage: true,
+        statName: "total_pop"
     };
     this.currYear = 2016;
-    this.color = {};
     this.maxStateValue = 0;
     this.minStateValue = 100;
     this.maxCountyPop = 0;
@@ -21,26 +20,27 @@ function MapController() {
             function(stateArray) {
                 // setup this.states
                 this.findStateValues(stateArray);
+                mapVisualization.setStateColor(
+                    d3
+                        .scaleLinear()
+                        .domain([this.minStateValue, this.maxStateValue])
+                        .range([this.leftColor, this.rightColor])
+                );
+
+                // Set up tool tip
+                mapVisualization.setMouseoverFormatterPercent(this.filter.shouldFindPercentage);
+
                 // Setup map
                 mapVisualization.requestUSTopoJSON(
                     function(err, geographyData) {
                         if (err) {
                             throw err;
                         } else {
-                            // First element is the lower bound, the last element is the upper
-                            // bound. The ones in between are the steps where the color changes.
-                            // Yes, the array needs to be this exact length for it to work :/
-                            var scale = this.getScale();
-                            this.color = d3
-                                .scaleLinear()
-                                .domain([this.minStateValue, this.maxStateValue])
-                                .range([this.leftColor, this.rightColor]);
                             // To rescale the key, rescale the colors, reset the key, and then
                             // rerender the key
                             //mapVisualization.renderKeyOnSVG("Test Statistic", this.color);
                             mapVisualization.renderUSOnSVG(
                                 geographyData,
-                                this.color,
                                 function(stateId) {
                                     // Getting state info
                                     return this.getState(stateId);
@@ -51,33 +51,20 @@ function MapController() {
                                             return loadCounties(stateId, this.filter.statName).then(
                                                 function(counts) {
                                                     // Getting county info
-                                                    this.counties = {};
-                                                    this.statePopulation = 0;
-                                                    try {
-                                                        counts.forEach(
-                                                            function(element) {
-                                                                this.counties[
-                                                                    element.county_id
-                                                                ] = element;
-                                                                var pop = parseInt(
-                                                                    element.years[this.currYear]
-                                                                        .statisticsTable[
-                                                                        this.filter.statName
-                                                                    ]
-                                                                );
-                                                                element.value = pop;
-                                                                this.statePopulation += pop;
-                                                            }.bind(this)
-                                                        );
-                                                        Object.keys(this.counties).forEach(
-                                                            function(key) {
-                                                                this.getCountry(key).value /=
-                                                                    this.statePopulation / 100;
-                                                            }.bind(this)
-                                                        );
-                                                    } catch (e) {
-                                                        console.log(e);
-                                                    }
+                                                    this.findCountyValues(counts);
+                                                    mapVisualization.setCountyColor(
+                                                        d3
+                                                            .scaleLinear()
+                                                            .domain([
+                                                                this.minCountyValue,
+                                                                this.maxCountyValue
+                                                            ])
+                                                            .range([
+                                                                this.leftColor,
+                                                                this.rightColor
+                                                            ])
+                                                    );
+
                                                     return resolve(
                                                         function(countyId) {
                                                             return this.getCounty(countyId);
@@ -102,32 +89,27 @@ function MapController() {
             }.bind(this)
         );
     };
-    this.getScale = function() {
-        var scale = [];
-        // avoid infinite loops
-        if (this.maxStateValue - this.minStateValue < 10) {
-            this.maxStateValue = this.minStateValue + 10;
-        }
-        for (
-            var i = this.minStateValue;
-            i <= this.maxStateValue;
-            i += (this.maxStateValue - this.minStateValue) / 10
-        ) {
-            scale.push(i);
-        }
-
-        return scale;
-    };
     // Updates the map. Call this when some data has changed
     this.updateMap = function() {
-        // Area id can be for a state or county
-        var scale = this.getScale();
-        this.findStateValues();
+        mapVisualization.setMouseoverFormatterPercent(this.filter.shouldFindPercentage);
 
-        this.color = d3
-            .scaleLinear()
-            .domain([this.minStateValue, this.maxStateValue])
-            .range([this.leftColor, this.rightColor]);
+        // Area id can be for a state or county
+        this.findStateValues();
+        this.findCountyValues();
+
+        mapVisualization.setStateColor(
+            d3
+                .scaleLinear()
+                .domain([this.minStateValue, this.maxStateValue])
+                .range([this.leftColor, this.rightColor])
+        );
+
+        mapVisualization.setCountyColor(
+            d3
+                .scaleLinear()
+                .domain([this.minCountyValue, this.maxCountyValue])
+                .range([this.leftColor, this.rightColor])
+        );
 
         mapVisualization.recolorMap(
             function(id) {
@@ -138,8 +120,7 @@ function MapController() {
                 }
 
                 return ret;
-            }.bind(this),
-            this.color
+            }.bind(this)
         );
     };
     // Returns the state with the given id if it exists
@@ -172,8 +153,10 @@ function MapController() {
                     element.value = value;
                     this.states[element.state_id] = element;
                     total += value;
-                    this.minStateValue = Math.min(value, this.minStateValue);
-                    this.maxStateValue = Math.max(value, this.maxStateValue);
+                    if (value >= 0) {
+                        this.minStateValue = Math.min(value, this.minStateValue);
+                        this.maxStateValue = Math.max(value, this.maxStateValue);
+                    }
                 }.bind(this)
             );
         } else {
@@ -191,8 +174,10 @@ function MapController() {
                     }
                     this.getState(key).value = value;
                     total += value;
-                    this.minStateValue = Math.min(value, this.minStateValue);
-                    this.maxStateValue = Math.max(value, this.maxStateValue);
+                    if (value >= 0) {
+                        this.minStateValue = Math.min(value, this.minStateValue);
+                        this.maxStateValue = Math.max(value, this.maxStateValue);
+                    }
                 }.bind(this)
             );
         }
@@ -203,8 +188,78 @@ function MapController() {
             Object.keys(this.states).forEach(
                 function(key) {
                     this.getState(key).value /= total / 100;
-                    this.minStateValue = Math.min(this.getState(key).value, this.minStateValue);
-                    this.maxStateValue = Math.max(this.getState(key).value, this.maxStateValue);
+                    if (this.getState(key).value >= 0) {
+                        this.minStateValue = Math.min(this.getState(key).value, this.minStateValue);
+                        this.maxStateValue = Math.max(this.getState(key).value, this.maxStateValue);
+                    }
+                }.bind(this)
+            );
+        }
+    };
+
+    this.findCountyValues = function(countyArray) {
+        this.counties = {};
+        this.maxCountyValue = 0;
+        this.minCountyValue = 10000000000;
+        var total = 0;
+        if (countyArray !== undefined) {
+            try {
+                countyArray.forEach(
+                    function(element) {
+                        this.counties[element.county_id] = element;
+                        var pop = parseInt(
+                            element.years[this.currYear].statisticsTable[this.filter.statName]
+                        );
+                        element.value = pop;
+                        total += pop;
+                        if (pop >= 0) {
+                            this.minStateValue = Math.min(pop, this.minStateValue);
+                            this.maxStateValue = Math.max(pop, this.maxStateValue);
+                        }
+                    }.bind(this)
+                );
+            } catch (e) {
+                console.log(e);
+            }
+        } else {
+            Object.keys(this.counties).forEach(
+                function(key) {
+                    var value = 0;
+                    if (this.getCounty(key).years[this.currYear] === undefined) {
+                        value = -1;
+                    } else {
+                        value = parseInt(
+                            this.getCounty(key).years[this.currYear].statisticsTable[
+                                this.filter.statName
+                            ]
+                        );
+                    }
+                    this.getCounty(key).value = value;
+                    total += value;
+                    if (value >= 0) {
+                        this.minStateValue = Math.min(value, this.minStateValue);
+                        this.maxStateValue = Math.max(value, this.maxStateValue);
+                    }
+                }.bind(this)
+            );
+        }
+
+        if (this.filter.shouldFindPercentage) {
+            this.maxCountyValue = 0;
+            this.minCountyValue = 100;
+            Object.keys(this.counties).forEach(
+                function(key) {
+                    this.getCounty(key).value /= total / 100;
+                    if (this.getCounty(key).value >= 0) {
+                        this.minCountyValue = Math.min(
+                            this.getCounty(key).value,
+                            this.minCountyValue
+                        );
+                        this.maxCountyValue = Math.max(
+                            this.getCounty(key).value,
+                            this.maxCountyValue
+                        );
+                    }
                 }.bind(this)
             );
         }

@@ -1,6 +1,10 @@
 "use strict";
 var mapVisualization = (function() {
     var currentZoomedInState;
+    var mouseoverFormatter;
+    var badDataColor = d3.rgb(0, 0, 0);
+    var stateColor = {};
+    var countyColor = {};
 
     var renderKeyOnSVG = function(statisticName, color) {
         var svg = d3.select("svg");
@@ -54,7 +58,11 @@ var mapVisualization = (function() {
                     .axisBottom(x)
                     .tickSize(13)
                     .tickFormat(function(x, i) {
-                        return x + "%";
+                        if (mouseoverFormatter !== undefined) {
+                            return mouseoverFormatter(x, i);
+                        } else {
+                            return x;
+                        }
                     })
                     .tickValues(color.domain())
             )
@@ -140,7 +148,6 @@ var mapVisualization = (function() {
     var renderCountiesForStateOnSVG = function(
         stateId,
         geographyData,
-        color,
         zoomOutCallback,
         countyDataFunction
     ) {
@@ -160,7 +167,7 @@ var mapVisualization = (function() {
             .enter()
             .append("path")
             .attr("fill", function(d) {
-                return color(countyDataFunction(d.id).value);
+                return colorPath(countyDataFunction, d, countyColor);
             })
             .attr("d", path)
             .attr("id", function(d) {
@@ -171,14 +178,16 @@ var mapVisualization = (function() {
             })
             .append("title")
             .text(function(d) {
-                return countyDataFunction(d.id).name + ": " + countyDataFunction(d.id).value + "%";
+                var str = countyDataFunction(d.id).name + ": " + countyDataFunction(d.id).value;
+                return mouseoverFormatter(str, d);
             });
     };
 
-    var renderUSOnSVG = function(geographyData, color, dataFunction, getCountyDataFunction) {
+    var renderUSOnSVG = function(geographyData, dataFunction, getCountyDataFunction) {
         var svg = d3.select("#map-container");
         var states = d3.select("#states");
         var path = d3.geoPath();
+
         currentZoomedInState = null;
 
         states
@@ -189,7 +198,7 @@ var mapVisualization = (function() {
             .enter()
             .append("path")
             .attr("fill", function(d) {
-                return color(dataFunction(d.id).value);
+                return colorPath(dataFunction, d, stateColor);
             })
             .attr("d", path)
             .attr("id", function(d) {
@@ -221,7 +230,6 @@ var mapVisualization = (function() {
                         renderCountiesForStateOnSVG(
                             d.id,
                             geographyData,
-                            color,
                             function() {
                                 resetNode("counties");
                                 zoomOut(d, svg);
@@ -238,19 +246,45 @@ var mapVisualization = (function() {
             })
             .append("title")
             .text(function(d) {
-                return dataFunction(d.id).name + ": " + dataFunction(d.id).value + "%";
+                var str = dataFunction(d.id).name + ": " + dataFunction(d.id).value;
+                return mouseoverFormatter(str, d);
             });
     };
 
-    var recolorMap = function(pathDataFunction, color) {
+    var recolorMap = function(pathDataFunction) {
         d3.selectAll("path").attr("fill", function(d) {
-            return color(pathDataFunction(d.id).value);
+            return colorPath(pathDataFunction, d, stateColor);
         });
+    };
+
+    var colorPath = function(dataFunction, d, color) {
+        console.log(color);
+        var value = dataFunction(d.id).value;
+        if (value < 0) {
+            return badDataColor;
+        }
+        return color(value);
     };
 
     // Will be null if not zoomed in
     var getCurrentlyZoomedInStateId = function() {
         return currentZoomedInState.id;
+    };
+
+    var setMouseoverFormatter = function(func) {
+        mouseoverFormatter = func;
+    };
+
+    var setMouseoverFormatterPercent = function(usePercent) {
+        if (usePercent) {
+            mouseoverFormatter = function(val, id) {
+                return val + "%";
+            };
+        } else {
+            mouseoverFormatter = function(val, id) {
+                return val;
+            };
+        }
     };
 
     var requestUSTopoJSON = function(callback) {
@@ -271,6 +305,14 @@ var mapVisualization = (function() {
         renderKeyOnSVG,
         resetNode,
         getCurrentlyZoomedInStateId,
-        recolorMap
+        recolorMap,
+        setMouseoverFormatter,
+        setMouseoverFormatterPercent,
+        setStateColor: function(color) {
+            stateColor = color;
+        },
+        setCountyColor: function(color) {
+            countyColor = color;
+        }
     };
 })();
