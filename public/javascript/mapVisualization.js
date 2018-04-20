@@ -249,6 +249,8 @@ var mapVisualization = (function() {
                 var str = dataFunction(d.id).name + ": " + dataFunction(d.id).value;
                 return mouseoverFormatter(str, d);
             });
+        d3.zoom().translateTo(svg, 480, 300);
+        svg.attr("transform", d3.zoomTransform(svg.node()));
     };
 
     var recolorMap = function(pathDataFunction) {
