@@ -196,6 +196,7 @@ var mapVisualization = (function() {
                 return "path" + d.id;
             })
             .on("mouseover", function(d) {
+                // State mouseover
                 var selection = svg.select("#path" + d.id);
                 var node = selection.node();
                 var parentNode = node.parentNode;
@@ -208,6 +209,7 @@ var mapVisualization = (function() {
                 selection.attr("filter", null);
             })
             .on("click", function(d) {
+                // State click
                 if (!currentZoomedInState || currentZoomedInState.id !== d.id) {
                     if (currentZoomedInState) {
                         resetTransform(currentZoomedInState, svg);
@@ -268,6 +270,7 @@ var mapVisualization = (function() {
         renderUSOnSVG,
         renderKeyOnSVG,
         resetNode,
-        getCurrentlyZoomedInStateId
+        getCurrentlyZoomedInStateId,
+        recolorMap
     };
 })();
