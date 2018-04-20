@@ -25,6 +25,7 @@ $(function() {
             $dropDown1.button.text(key);
             $dropDown2.menu.empty();
             $dropDown2.button.text("Filter");
+            $run.addClass("disabled");
 
             if ($option.obj.categories !== undefined) {
                 console.log("2 menus");
@@ -54,6 +55,7 @@ $(function() {
                         $dropDown2.button.text(key);
                         $dropDown3.menu.empty();
                         $dropDown3.button.text("Filter");
+                        $run.addClass("disabled");
 
                         Object.keys($subOption.obj.categories).forEach(function(key) {
                             console.log("3rd added");
@@ -99,7 +101,15 @@ function clear() {
 }
 
 function run() {
-    console.log("Todo");
+    var statSelected = $dropDown1.button.text();
+    if ($dropDown2.css("visibility") === "visible") {
+        statSelected += "." + $dropDown2.button.text();
+        if ($dropDown3.css("visibility") === "visible") {
+            statSelected += "." + $dropDown3.button.text();
+        }
+    }
+
+    console.log(statSelected);
 }
 
 function hideStuff() {
