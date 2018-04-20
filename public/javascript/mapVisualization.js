@@ -244,7 +244,7 @@ var mapVisualization = (function() {
 
     var recolorMap = function(pathDataFunction, color) {
         d3.selectAll("path").attr("fill", function(d) {
-            return color(pathDataFunction(d.id));
+            return color(pathDataFunction(d.id).value);
         });
     };
 

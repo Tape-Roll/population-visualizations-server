@@ -122,7 +122,7 @@ function MapController() {
         this.color = d3
             .scaleThreshold()
             .domain(scale)
-            .range(d3.schemeSpectral[11].reverse());
+            .range(d3.schemeSpectral[11]);
 
         this.findStateValues();
         mapVisualization.recolorMap(
