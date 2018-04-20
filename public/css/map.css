@@ -19,9 +19,12 @@
 }
 
 .filter-div {
+    padding: 10px 30px;
     width: calc(80% - 40px);
-    height: 30px;
-    background: blue;
+}
+
+.dropdown-item {
+    cursor: pointer;
 }
 
 .side-bar-cont {
