@@ -48,9 +48,9 @@
 }
 
 .side-bar {
-    width: 15vw;
-    height: 80vh;
-    margin-left: 20px;
+    width: 20vw;
+    height: 100vh;
+    margin-left: 0;
     overflow-y: auto;
 }
 

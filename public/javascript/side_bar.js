@@ -7,7 +7,7 @@ $(function() {
 
     $close_button.on("click", function(event) {
         if ($side_bar.shown) {
-            var pos = $side_bar.width() - $close_button.outerWidth();
+            var pos = $side_bar.width() - $close_button.outerWidth(true);
             $side_bar_cont.css("left", -pos + "px");
             $close_button.html(' <i class="fas fa-angle-double-right"></i>');
         } else {

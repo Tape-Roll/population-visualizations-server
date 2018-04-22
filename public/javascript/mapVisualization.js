@@ -295,6 +295,18 @@ var mapVisualization = (function() {
         mouseoverFormatter = func;
     };
 
+	var addCommas = function(nStr) {
+		nStr += '';
+		var x = nStr.split('.');
+		var x1 = x[0];
+		var x2 = x.length > 1 ? '.' + x[1] : '';
+		var rgx = /(\d+)(\d{3})/;
+		while (rgx.test(x1)) {
+			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+		}
+		return x1 + x2;
+	}
+
     var setMouseoverFormatterPercent = function(usePercent) {
         if (usePercent) {
             mouseoverFormatter = function(val, id) {
@@ -302,7 +314,10 @@ var mapVisualization = (function() {
             };
         } else {
             mouseoverFormatter = function(val, id) {
-                return val;
+                var spaceIndex = val.lastIndexOf(' ');
+                return val.substr(0, spaceIndex)
+                    + ' ' + addCommas(val.substr(spaceIndex + 1, val.length))
+                    + ' people';
             };
         }
     };
