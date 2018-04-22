@@ -316,8 +316,7 @@ var mapVisualization = (function() {
             mouseoverFormatter = function(val, id) {
                 var spaceIndex = val.lastIndexOf(' ');
                 return val.substr(0, spaceIndex)
-                    + ' ' + addCommas(val.substr(spaceIndex + 1, val.length))
-                    + ' people';
+                    + ' ' + addCommas(val.substr(spaceIndex + 1, val.length));
             };
         }
     };
