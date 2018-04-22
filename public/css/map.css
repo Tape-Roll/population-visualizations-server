@@ -1,5 +1,7 @@
 .filter-div,
-.side-bar-cont {
+.side-bar-cont,
+.dropdown,
+.dropdown-item {
     z-index: 1;
 }
 
@@ -42,14 +44,22 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: 200ms left ease;
 }
 
 .side-bar {
-    padding: 10px 30px;
     width: 15vw;
     height: 80vh;
     margin-left: 20px;
     overflow-y: auto;
+}
+
+#close-button {
+    margin: 10px;
+}
+
+.side-bar-contents {
+    padding: 10px 30px;
 }
 
 .map-div {
@@ -114,5 +124,5 @@ svg {
 }
 
 .side-bar td {
-  margin: 10px;
+    margin: 10px;
 }
