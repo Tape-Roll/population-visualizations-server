@@ -315,8 +315,13 @@ var mapVisualization = (function() {
         } else {
             mouseoverFormatter = function(val, id) {
                 var spaceIndex = val.lastIndexOf(' ');
-                return val.substr(0, spaceIndex)
-                    + ' ' + addCommas(val.substr(spaceIndex + 1, val.length));
+                var unformattedNumberString = val.substr(spaceIndex + 1, val.length)
+                var nameString = val.substr(0, spaceIndex);
+                var number = parseInt(unformattedNumberString);
+                if (number < 0) {
+                    return nameString + ' Unknown';
+                }
+                return nameString + ' ' + addCommas(unformattedNumberString);
             };
         }
     };
