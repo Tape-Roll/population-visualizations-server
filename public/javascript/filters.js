@@ -22,6 +22,10 @@ $(function() {
     hideStuff();
 
     Object.keys(filters).forEach(function(key) {
+        if (key.includes("divider")) {
+            $dropDown1.menu.append('<div class="dropdown-divider"></div>');
+            return;
+        }
         var $option = $('<div class="dropdown-item">' + key + "</div>");
         $option.obj = filters[key];
 
@@ -149,6 +153,7 @@ var filters = {
     median_age: {
         showPercentage: false
     },
+    divider1: {},
     total_age: {
         categories: {
             "1 to 4 years": {},
@@ -209,6 +214,7 @@ var filters = {
         },
         showPercentage: false
     },
+    divider2: {},
     same_county: {
         contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
     },
