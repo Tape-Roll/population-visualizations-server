@@ -3,6 +3,11 @@ var $dropDown2;
 var $dropDown3;
 var $run;
 var $clear;
+var filter = {
+    shouldFindPercentage: false,
+    statName: "total_pop",
+    shouldShowPercentage: false
+};
 
 $(function() {
     $dropDown1 = getDropDown("#drop1");
@@ -25,10 +30,11 @@ $(function() {
             $dropDown1.button.text(key);
             $dropDown2.menu.empty();
             $dropDown2.button.text("Filter");
+            $dropDown3.css("visibility", "hidden");
+
             $run.addClass("disabled");
 
             if ($option.obj.categories !== undefined) {
-                console.log("2 menus");
                 Object.keys($option.obj.categories).forEach(function(key) {
                     var $subOption = $('<div class="dropdown-item">' + key + "</div>");
                     $subOption.obj = $option.obj.categories[key];
@@ -36,6 +42,8 @@ $(function() {
                     //Handle menu2 clicks
                     $subOption.on("click", function(event) {
                         $dropDown2.button.text(key);
+                        $dropDown3.css("visibility", "hidden");
+
                         finalCategory();
                     });
 
@@ -45,7 +53,6 @@ $(function() {
 
                 $dropDown2.css("visibility", "visible");
             } else if ($option.obj.contains !== undefined) {
-                console.log("3 menus");
                 $option.obj.contains.forEach(function(key) {
                     var $subOption = $('<div class="dropdown-item">' + key + "</div>");
                     $subOption.obj = filters["total_" + key];
@@ -102,14 +109,24 @@ function clear() {
 
 function run() {
     var statSelected = $dropDown1.button.text();
+    filter.shouldShowPercentage = false;
+    filter.shouldFindPercentage = false;
+
     if ($dropDown2.css("visibility") === "visible") {
         statSelected += "." + $dropDown2.button.text();
+        filter.shouldFindPercentage = true;
+
         if ($dropDown3.css("visibility") === "visible") {
             statSelected += "." + $dropDown3.button.text();
+            filter.shouldShowPercentage = true;
+            filter.shouldFindPercentage = false;
         }
     }
 
     console.log(statSelected);
+    filter.statName = statSelected;
+
+    window.dispatchEvent(new CustomEvent("StatChanged", { detail: filter }));
 }
 
 function hideStuff() {
@@ -165,14 +182,14 @@ var filters = {
         },
         showPercentage: false
     },
-    total_nativity: {
-        categories: {
-            Native: {},
-            "Naturalized U.S. citizen": {},
-            "Not a U.S. citizen": {}
-        },
-        showPercentage: false
-    },
+    // total_nativity: {
+    //     categories: {
+    //         Native: {},
+    //         "Naturalized U.S. citizen": {},
+    //         "Not a U.S. citizen": {}
+    //     },
+    //     showPercentage: false
+    // },
     total_marital_status: {
         categories: {
             "Never married": {},
@@ -182,7 +199,7 @@ var filters = {
         },
         showPercentage: false
     },
-    total_marital_status: {
+    total_education: {
         categories: {
             "Less than high school graduate": {},
             "High school graduate (includes equivalency)": {},
@@ -193,15 +210,15 @@ var filters = {
         showPercentage: false
     },
     same_county: {
-        contains: ["age", "gender", "race", "nativity", "marital_status", "education"]
+        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
     },
     moved_county: {
-        contains: ["age", "gender", "race", "nativity", "marital_status", "education"]
+        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
     },
     moved_state: {
-        contains: ["age", "gender", "race", "nativity", "marital_status", "education"]
+        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
     },
     abroad: {
-        contains: ["age", "gender", "race", "nativity", "marital_status", "education"]
+        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
     }
 };

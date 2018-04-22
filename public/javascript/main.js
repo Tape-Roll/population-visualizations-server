@@ -3,11 +3,6 @@
 function MapController() {
     this.states = {};
     this.counties = {};
-    this.filter = {
-        shouldFindPercentage: false,
-        statName: "moved_county.age.1 to 4 years"
-        //statName: "median_age"
-    };
     this.currYear = 2016;
     this.maxStateValue = 0;
     this.minStateValue = 100;
@@ -17,7 +12,7 @@ function MapController() {
     this.rightColor = "red";
     this.init = function() {
         // Load data for states right at the beginning
-        loadStates(this.filter.statName).then(
+        loadStates(filter.statName).then(
             function(stateArray) {
                 // setup this.states
                 this.findStateValues(stateArray);
@@ -29,7 +24,9 @@ function MapController() {
                 );
 
                 // Set up tool tip
-                mapVisualization.setMouseoverFormatterPercent(this.filter.shouldFindPercentage);
+                mapVisualization.setMouseoverFormatterPercent(
+                    filter.shouldFindPercentage || filter.shouldShowPercentage
+                );
 
                 // Setup map
                 mapVisualization.requestUSTopoJSON(
@@ -49,7 +46,7 @@ function MapController() {
                                 function(stateId) {
                                     return new Promise(
                                         function(resolve, reject) {
-                                            return loadCounties(stateId, this.filter.statName).then(
+                                            return loadCounties(stateId, filter.statName).then(
                                                 function(counts) {
                                                     // Getting county info
                                                     this.findCountyValues(counts);
@@ -89,39 +86,85 @@ function MapController() {
                 this.updateMap();
             }.bind(this)
         );
-    };
-    // Updates the map. Call this when some data has changed
-    this.updateMap = function() {
-        mapVisualization.setMouseoverFormatterPercent(this.filter.shouldFindPercentage);
 
-        this.findStateValues();
-        this.findCountyValues();
-
-        mapVisualization.setStateColor(
-            d3
-                .scaleLinear()
-                .domain([this.minStateValue, this.maxStateValue])
-                .range([this.leftColor, this.rightColor])
-        );
-
-        mapVisualization.setCountyColor(
-            d3
-                .scaleLinear()
-                .domain([this.minCountyValue, this.maxCountyValue])
-                .range([this.leftColor, this.rightColor])
-        );
-
-        mapVisualization.recolorMap(
-            function(id) {
-                var ret = this.getState(id);
-                if (ret === undefined) {
-                    ret = this.getCounty(id);
-                } else {
-                }
-
-                return ret;
+        window.addEventListener(
+            "StatChanged",
+            function(event) {
+                this.updateMap(true);
             }.bind(this)
         );
+    };
+    // Updates the map. Call this when some data has changed
+    this.updateMap = function(stat_change = false) {
+        var cb = function() {
+            mapVisualization.setMouseoverFormatterPercent(
+                filter.shouldFindPercentage || filter.shouldShowPercentage
+            );
+
+            mapVisualization.setStateColor(
+                d3
+                    .scaleLinear()
+                    .domain([this.minStateValue, this.maxStateValue])
+                    .range([this.leftColor, this.rightColor])
+            );
+
+            mapVisualization.setCountyColor(
+                d3
+                    .scaleLinear()
+                    .domain([this.minCountyValue, this.maxCountyValue])
+                    .range([this.leftColor, this.rightColor])
+            );
+
+            mapVisualization.recolorMap(
+                function(id) {
+                    var ret = this.getState(id);
+                    if (ret === undefined) {
+                        ret = this.getCounty(id);
+                    } else {
+                    }
+
+                    return ret;
+                }.bind(this)
+            );
+        }.bind(this);
+
+        if (stat_change) {
+            // Stat changed!! uh oh
+            var cbCount = 0;
+            var expectedCount = 1;
+            var callMe = function() {
+                cbCount++;
+                if (cbCount >= expectedCount) {
+                    cb();
+                }
+            };
+            if (mapVisualization.getCurrentlyZoomedInStateId() !== null) {
+                // Need to load county
+                expectedCount++;
+                loadCounties(mapVisualization.getCurrentlyZoomedInStateId(), filter.statName).then(
+                    function(counts) {
+                        this.findCountyValues(counts);
+                        console.log("County stat loaded");
+                        callMe();
+                    }.bind(this)
+                );
+            }
+
+            // Load states
+            loadStates(filter.statName).then(
+                function(stateArray) {
+                    this.findStateValues(stateArray);
+                    console.log("State stat loaded");
+                    callMe();
+                }.bind(this)
+            );
+        } else {
+            // Just a year change
+            this.findStateValues();
+            this.findCountyValues();
+
+            cb();
+        }
     };
     // Returns the state with the given id if it exists
     this.getState = function(id) {
@@ -145,7 +188,6 @@ function MapController() {
         this.minStateValue = 10000000000;
         var total = 0;
         if (stateArray !== undefined) {
-            console.log(stateArray);
             stateArray.forEach(
                 function(element) {
                     var value = parseInt(this.findValue(element));
@@ -177,12 +219,13 @@ function MapController() {
             );
         }
 
-        if (this.filter.shouldFindPercentage) {
+        if (filter.shouldFindPercentage) {
             this.maxStateValue = 0;
             this.minStateValue = 100;
             Object.keys(this.states).forEach(
                 function(key) {
-                    this.getState(key).value /= total / 100;
+                    this.getState(key).value /=
+                        this.getState(key).years[this.currYear].statisticsTable.total_pop / 100;
                     if (this.getState(key).value >= 0) {
                         this.minStateValue = Math.min(this.getState(key).value, this.minStateValue);
                         this.maxStateValue = Math.max(this.getState(key).value, this.maxStateValue);
@@ -232,7 +275,7 @@ function MapController() {
             );
         }
 
-        if (this.filter.shouldFindPercentage) {
+        if (filter.shouldFindPercentage) {
             this.maxCountyValue = 0;
             this.minCountyValue = 100;
             Object.keys(this.counties).forEach(
@@ -254,13 +297,34 @@ function MapController() {
     };
 
     this.findValue = function(obj) {
+        if (
+            obj === undefined ||
+            obj.years === undefined ||
+            obj.years[this.currYear] === undefined ||
+            obj.years[this.currYear].statisticsTable === undefined
+        ) {
+            return -1;
+        }
         var table = obj.years[this.currYear].statisticsTable;
-        keys = this.filter.statName.split(".");
+        keys = filter.statName.split(".");
+
+        var notFoundFlag = false;
         keys.forEach(
             function(element) {
+                if (notFoundFlag) {
+                    return;
+                }
                 table = table[element];
+                if (table === undefined) {
+                    notFoundFlag = true;
+                }
             }.bind(this)
         );
+
+        if (notFoundFlag) {
+            return -1;
+        }
+
         return table;
     };
 }

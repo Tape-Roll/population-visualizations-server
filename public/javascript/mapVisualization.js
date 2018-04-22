@@ -167,7 +167,7 @@ var mapVisualization = (function() {
             .enter()
             .append("path")
             .attr("fill", function(d) {
-                return colorPath(countyDataFunction, d, countyColor);
+                return colorPath(countyDataFunction, d);
             })
             .attr("d", path)
             .attr("id", function(d) {
@@ -198,7 +198,7 @@ var mapVisualization = (function() {
             .enter()
             .append("path")
             .attr("fill", function(d) {
-                return colorPath(dataFunction, d, stateColor);
+                return colorPath(dataFunction, d);
             })
             .attr("d", path)
             .attr("id", function(d) {
@@ -258,9 +258,9 @@ var mapVisualization = (function() {
             .selectAll("path")
             .attr("fill", function(d) {
                 if (currentZoomedInState !== null && currentZoomedInState.id === d.id) {
-                    return 'none'
+                    return "none";
                 } else {
-                    return colorPath(pathDataFunction, d, stateColor);
+                    return colorPath(pathDataFunction, d);
                 }
             })
             .select("title")
@@ -270,16 +270,24 @@ var mapVisualization = (function() {
             });
     };
 
-    var colorPath = function(dataFunction, d, color) {
-        var value = dataFunction(d.id).value;
-        if (value < 0) {
+    var colorPath = function(dataFunction, d) {
+        var data = dataFunction(d.id);
+        var value = data.value;
+        if (isNaN(value) || value < 0) {
             return badDataColor;
         }
-        return color(value);
+        if (data.county_id !== undefined) {
+            return countyColor(value);
+        }
+
+        return stateColor(value);
     };
 
     // Will be null if not zoomed in
     var getCurrentlyZoomedInStateId = function() {
+        if (currentZoomedInState === null) {
+            return null;
+        }
         return currentZoomedInState.id;
     };
 

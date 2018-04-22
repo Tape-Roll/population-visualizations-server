@@ -36,6 +36,7 @@ function addYearProjections(obj, pre = "years.", post = ".statisticsTable.total_
     highYear = 2016;
     for (let i = lowYear; i <= highYear; i++) {
         obj[`${pre}${i}${post}`] = 1;
+        obj[`${pre}${i}.statisticsTable.total_pop`] = 1;
     }
     return obj;
 }

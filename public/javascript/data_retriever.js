@@ -34,7 +34,6 @@ var loadCounties = function(stateId, stat) {
         axios
             .post("/api/state/" + stateId, { requestedStat: stat })
             .then(function(res) {
-                console.log(res);
                 res = res.data;
                 if (res.error) {
                     console.log(res.error);
