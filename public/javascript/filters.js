@@ -15,6 +15,7 @@ var nextFilter = {
 
 $(function() {
     $dropDown1 = getDropDown("#drop1");
+    $dropDown1.selectedStat = "total_pop";
     $dropDown2 = getDropDown("#drop2");
     $dropDown3 = getDropDown("#drop3");
     $run = $("#run-button");
