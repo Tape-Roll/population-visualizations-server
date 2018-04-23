@@ -8,6 +8,10 @@ var filter = {
     statName: "total_pop",
     shouldShowPercentage: false
 };
+var nextFilter = {
+    shouldFindPercentage: false,
+    shouldShowPercentage: false
+};
 
 $(function() {
     $dropDown1 = getDropDown("#drop1");
@@ -49,7 +53,7 @@ $(function() {
                         $dropDown2.button.text(key);
                         $dropDown3.css("visibility", "hidden");
 
-                        finalCategory();
+                        finalCategory($subOption.obj, $option.obj);
                     });
 
                     // Append menu 2
@@ -59,6 +63,7 @@ $(function() {
                 $dropDown2.css("visibility", "visible");
             } else if ($option.obj.contains !== undefined) {
                 $option.obj.contains.forEach(function(key) {
+                    console.log(key);
                     var $subOption = $('<div class="dropdown-item">' + key + "</div>");
                     $subOption.obj = filters["total_" + key];
 
@@ -77,7 +82,7 @@ $(function() {
                             //Handle menu3 clicks
                             $finalOption.on("click", function(event) {
                                 $dropDown3.button.text(key);
-                                finalCategory();
+                                finalCategory($finalOption.obj, $subOption.obj, $option.obj);
                             });
 
                             // Append menu 3
@@ -94,7 +99,7 @@ $(function() {
             } else {
                 $dropDown2.css("visibility", "hidden");
                 $dropDown3.css("visibility", "hidden");
-                finalCategory();
+                finalCategory($option.obj);
             }
         });
 
@@ -103,8 +108,29 @@ $(function() {
     });
 });
 
-function finalCategory() {
+function finalCategory(primaryFilterObj, secondaryFilterObj = {}, thirdFilterObj = {}) {
     $run.removeClass("disabled");
+    if (thirdFilterObj.shouldShowPercentage !== undefined) {
+        nextFilter.shouldShowPercentage = thirdFilterObj.shouldShowPercentage;
+    } else if (secondaryFilterObj.shouldShowPercentage !== undefined) {
+        nextFilter.shouldShowPercentage = secondaryFilterObj.shouldShowPercentage;
+    } else if (primaryFilterObj.shouldShowPercentage !== undefined) {
+        nextFilter.shouldShowPercentage = primaryFilterObj.shouldShowPercentage;
+    } else {
+        nextFilter.shouldShowPercentage = false;
+    }
+
+    if (thirdFilterObj.shouldFindPercentage !== undefined) {
+        nextFilter.shouldFindPercentage = thirdFilterObj.shouldFindPercentage;
+    } else if (secondaryFilterObj.shouldFindPercentage !== undefined) {
+        nextFilter.shouldFindPercentage = secondaryFilterObj.shouldFindPercentage;
+    } else if (primaryFilterObj.shouldFindPercentage !== undefined) {
+        nextFilter.shouldFindPercentage = primaryFilterObj.shouldFindPercentage;
+    } else {
+        nextFilter.shouldFindPercentage = false;
+    }
+
+    console.log(nextFilter);
 }
 
 function clear() {
@@ -114,21 +140,17 @@ function clear() {
 
 function run() {
     var statSelected = $dropDown1.button.text();
-    filter.shouldShowPercentage = false;
-    filter.shouldFindPercentage = false;
+    filter.shouldShowPercentage = nextFilter.shouldShowPercentage;
+    filter.shouldFindPercentage = nextFilter.shouldFindPercentage;
 
     if ($dropDown2.css("visibility") === "visible") {
         statSelected += "." + $dropDown2.button.text();
-        filter.shouldFindPercentage = true;
 
         if ($dropDown3.css("visibility") === "visible") {
             statSelected += "." + $dropDown3.button.text();
-            filter.shouldShowPercentage = true;
-            filter.shouldFindPercentage = false;
         }
     }
 
-    console.log(statSelected);
     filter.statName = statSelected.trim();
 
     window.dispatchEvent(new CustomEvent("StatChanged", { detail: filter }));
@@ -149,13 +171,26 @@ function getDropDown(id) {
 
 var filters = {
     total_pop: {
-        showPercentage: false
+        shouldShowPercentage: false
     },
-    median_age: {
-        showPercentage: false
+    median_pop: {
+        shouldShowPercentage: false
+    },
+    total_same_county: {
+        shouldShowPercentage: true
+    },
+    total_moved_county: {
+        shouldShowPercentage: true
+    },
+    total_moved_state: {
+        shouldShowPercentage: true
+    },
+    total_abroad: {
+        shouldShowPercentage: true
     },
     divider1: {},
     total_age: {
+        shouldFindPercentage: true,
         categories: {
             "1 to 4 years": {},
             "5 to 17 years": {},
@@ -166,17 +201,17 @@ var filters = {
             "55 to 64 years": {},
             "65 to 74 years": {},
             "75 years and over": {}
-        },
-        showPercentage: false
+        }
     },
     total_gender: {
+        shouldFindPercentage: true,
         categories: {
             Male: {},
             Female: {}
-        },
-        showPercentage: false
+        }
     },
     total_race: {
+        shouldFindPercentage: true,
         categories: {
             White: {},
             "Black or African American": {},
@@ -185,47 +220,54 @@ var filters = {
             "Native Hawaiian and Other Pacific Islander": {},
             "Some other race": {},
             "Two or more races": {}
-        },
-        showPercentage: false
+        }
     },
-    // total_nativity: {
-    //     categories: {
-    //         Native: {},
-    //         "Naturalized U.S. citizen": {},
-    //         "Not a U.S. citizen": {}
-    //     },
-    //     showPercentage: false
-    // },
+    total_nativity: {
+        shouldFindPercentage: true,
+        categories: {
+            Native: {},
+            "Naturalized US citizen": {},
+            "Not a US citizen": {}
+        }
+    },
     total_marital_status: {
+        shouldFindPercentage: true,
         categories: {
             "Never married": {},
             "Now married, except separated": {},
             "Divorced or separated": {},
             Widowed: {}
-        },
-        showPercentage: false
+        }
     },
     total_education: {
+        shouldFindPercentage: true,
         categories: {
             "Less than high school graduate": {},
             "High school graduate (includes equivalency)": {},
             "Some college or associate's degree": {},
             "Bachelor's degree": {},
             "Graduate or professional degree": {}
-        },
-        showPercentage: false
+        }
     },
     divider2: {},
     same_county: {
-        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
+        contains: ["age", "gender", "race", "nativity", "marital_status", "education"],
+        shouldShowPercentage: true,
+        shouldFindPercentage: false
     },
     moved_county: {
-        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
+        contains: ["age", "gender", "race", "nativity", "marital_status", "education"],
+        shouldShowPercentage: true,
+        shouldFindPercentage: false
     },
     moved_state: {
-        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
+        contains: ["age", "gender", "race", "nativity", "marital_status", "education"],
+        shouldShowPercentage: true,
+        shouldFindPercentage: false
     },
     abroad: {
-        contains: ["age", "gender", "race", /*"nativity",*/ "marital_status", "education"]
+        contains: ["age", "gender", "race", "nativity", "marital_status", "education"],
+        shouldShowPercentage: true,
+        shouldFindPercentage: false
     }
 };

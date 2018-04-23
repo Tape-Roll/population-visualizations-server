@@ -226,7 +226,9 @@ var mapVisualization = (function() {
                     zoomIntoState(d, svg);
                     currentZoomedInState = d;
                     getCountyDataFunction(d.id).then(function(countyDataFunction) {
-                        window.dispatchEvent(new CustomEvent("SelectionChanged", { detail: currentZoomedInState.id }));
+                        window.dispatchEvent(
+                            new CustomEvent("SelectionChanged", { detail: currentZoomedInState.id })
+                        );
                         renderCountiesForStateOnSVG(
                             d.id,
                             geographyData,
@@ -234,7 +236,9 @@ var mapVisualization = (function() {
                                 resetNode("counties");
                                 zoomOut(d, svg);
                                 currentZoomedInState = null;
-                                window.dispatchEvent(new CustomEvent("SelectionChanged", { detail: null }));
+                                window.dispatchEvent(
+                                    new CustomEvent("SelectionChanged", { detail: null })
+                                );
                             },
                             countyDataFunction
                         );
@@ -303,14 +307,14 @@ var mapVisualization = (function() {
             };
         } else {
             mouseoverFormatter = function(val, id) {
-                var spaceIndex = val.lastIndexOf(' ');
-                var unformattedNumberString = val.substr(spaceIndex + 1, val.length)
+                var spaceIndex = val.lastIndexOf(" ");
+                var unformattedNumberString = val.substr(spaceIndex + 1, val.length);
                 var nameString = val.substr(0, spaceIndex);
-                var number = parseInt(unformattedNumberString);
+                var number = parseFloat(unformattedNumberString);
                 if (number < 0) {
-                    return nameString + ' Unknown';
+                    return nameString + " Unknown";
                 }
-                return nameString + ' ' + formatter.addCommas(unformattedNumberString);
+                return nameString + " " + formatter.addCommas(unformattedNumberString);
             };
         }
     };

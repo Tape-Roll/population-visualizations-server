@@ -113,7 +113,7 @@ function MapController() {
         var title;
         if (selectedStateId) {
             elements = this.getCountiesInState(selectedStateId);
-            title = this.states[parseInt(selectedStateId)].name;
+            title = this.states[parseFloat(selectedStateId)].name;
         } else {
             elements = this.statesToArray();
             title = "United States";
@@ -202,8 +202,8 @@ function MapController() {
     };
     // Returns the state with the given id if it exists
     this.getState = function(id) {
-        id = parseInt(id);
-        return this.states[parseInt(id)];
+        id = parseFloat(id);
+        return this.states[parseFloat(id)];
     };
     this.statesToArray = function() {
         var states = [];
@@ -216,7 +216,7 @@ function MapController() {
     };
     // Returns the county with the given id if it exists
     this.getCounty = function(id) {
-        id = parseInt(id);
+        id = parseFloat(id);
         if (this.counties[id] === undefined || this.counties[id].value === undefined) {
             console.log("Missing county: ", this.counties);
             // Uh oh. The county isn't found or set up right
@@ -226,7 +226,7 @@ function MapController() {
     };
     // Returns the counties of the state with the given id if it exists
     this.getCountiesInState = function(stateId) {
-        stateId = "" + parseInt(stateId);
+        stateId = "" + parseFloat(stateId);
         var countiesInState = [];
         for (countyId in this.counties) {
             if (this.counties.hasOwnProperty(countyId) && countyId.startsWith(stateId)) {
@@ -244,7 +244,7 @@ function MapController() {
         if (stateArray !== undefined) {
             stateArray.forEach(
                 function(element) {
-                    var value = parseInt(this.findValue(element));
+                    var value = parseFloat(this.findValue(element));
                     element.value = value;
                     this.states[element.state_id] = element;
                     total += value;
@@ -261,7 +261,7 @@ function MapController() {
                     if (this.getState(key).years[this.currYear] === undefined) {
                         value = -1;
                     } else {
-                        value = parseInt(this.findValue(this.getState(key)));
+                        value = parseFloat(this.findValue(this.getState(key)));
                     }
                     this.getState(key).value = value;
                     total += value;
@@ -298,7 +298,7 @@ function MapController() {
                 countyArray.forEach(
                     function(element) {
                         this.counties[element.county_id] = element;
-                        var pop = parseInt(this.findValue(element));
+                        var pop = parseFloat(this.findValue(element));
                         element.value = pop;
                         total += pop;
                         if (pop >= 0) {
@@ -317,7 +317,7 @@ function MapController() {
                     if (this.getCounty(key).years[this.currYear] === undefined) {
                         value = -1;
                     } else {
-                        value = parseInt(this.findValue(this.getCounty(key)));
+                        value = parseFloat(this.findValue(this.getCounty(key)));
                     }
                     this.getCounty(key).value = value;
                     total += value;
