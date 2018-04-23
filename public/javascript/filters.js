@@ -20,6 +20,7 @@ $(function() {
     $run.on("click", run);
 
     hideStuff();
+    $run.removeClass("disabled");
 
     Object.keys(filters).forEach(function(key) {
         if (key.includes("divider")) {
