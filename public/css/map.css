@@ -51,7 +51,7 @@
     width: 22vw;
     height: 100vh;
     margin-left: 0;
-    overflow: auto;
+    /*  overflow: auto; */
 }
 
 .sort-header {
@@ -130,4 +130,9 @@ svg {
 
 .side-bar td {
     margin: 10px;
+}
+
+#side-bar-table-cont {
+  overflow-y: scroll;
+  height: 90vh;
 }
