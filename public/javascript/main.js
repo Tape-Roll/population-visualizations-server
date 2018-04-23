@@ -92,14 +92,18 @@ function MapController() {
         window.addEventListener(
             "StatChanged",
             function(event) {
-                this.updateMap(true);
-                this.updateSideBar(this.currentlySelectedStateId);
+                this.updateMap(
+                    function() {
+                        this.updateSideBar(this.currentlySelectedStateId);
+                    }.bind(this),
+                    true
+                );
             }.bind(this)
         );
         window.addEventListener(
             "SelectionChanged",
             function(event) {
-                this.currentlySelectedStateId = event.detail
+                this.currentlySelectedStateId = event.detail;
                 this.updateSideBar(this.currentlySelectedStateId);
             }.bind(this)
         );
@@ -112,12 +116,16 @@ function MapController() {
             title = this.states[parseInt(selectedStateId)].name;
         } else {
             elements = this.statesToArray();
-            title = 'United States';
+            title = "United States";
         }
-        side_bar.update_side_bar(title, elements, filter.shouldShowPercentage || filter.shouldFindPercentage);
-    }
+        side_bar.update_side_bar(
+            title,
+            elements,
+            filter.shouldShowPercentage || filter.shouldFindPercentage
+        );
+    };
     // Updates the map. Call this when some data has changed
-    this.updateMap = function(stat_change = false) {
+    this.updateMap = function(postUpdate, stat_change = false) {
         var cb = function() {
             mapVisualization.setMouseoverFormatterPercent(
                 filter.shouldFindPercentage || filter.shouldShowPercentage
@@ -148,6 +156,10 @@ function MapController() {
                     return ret;
                 }.bind(this)
             );
+
+            if (postUpdate !== undefined) {
+                postUpdate();
+            }
         }.bind(this);
 
         if (stat_change) {
@@ -194,14 +206,14 @@ function MapController() {
         return this.states[parseInt(id)];
     };
     this.statesToArray = function() {
-        var states = []
+        var states = [];
         for (stateId in this.states) {
             if (this.states.hasOwnProperty(stateId)) {
                 states.push(this.states[stateId]);
             }
         }
         return states;
-    }
+    };
     // Returns the county with the given id if it exists
     this.getCounty = function(id) {
         id = parseInt(id);
@@ -214,7 +226,7 @@ function MapController() {
     };
     // Returns the counties of the state with the given id if it exists
     this.getCountiesInState = function(stateId) {
-        stateId = '' + parseInt(stateId);
+        stateId = "" + parseInt(stateId);
         var countiesInState = [];
         for (countyId in this.counties) {
             if (this.counties.hasOwnProperty(countyId) && countyId.startsWith(stateId)) {
@@ -322,7 +334,8 @@ function MapController() {
             this.minCountyValue = 100;
             Object.keys(this.counties).forEach(
                 function(key) {
-                    this.getCounty(key).value /= total / 100;
+                    this.getCounty(key).value /=
+                        this.getCounty(key).years[this.currYear].statisticsTable.total_pop / 100;
                     if (this.getCounty(key).value >= 0) {
                         this.minCountyValue = Math.min(
                             this.getCounty(key).value,
