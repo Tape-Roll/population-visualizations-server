@@ -17,3 +17,26 @@ $(function() {
         $side_bar.shown = !$side_bar.shown;
     });
 });
+
+var side_bar = (function() {
+    var update_side_bar = function(title, data, showPercentage) {
+        console.log("Updating the side bar!");
+        console.log('Title:' + title);
+        console.log(data);
+        var $side_bar_title = $('#side-bar-title');
+        var $side_bar_table = $('#side-bar-table');
+        $side_bar_title.html(title);
+        $side_bar_table.html('');
+        var tableHtml = '';
+        for (var i = 0; i < data.length; i++) {
+            var element = data[i];
+            tableHtml += '<tr><td>' + element.name + '</td><td>'
+                         + (showPercentage ? element.value + '%' : formatter.addCommas(element.value))
+                         + '</td></tr>'
+        }
+        $side_bar_table.html(tableHtml);
+    }
+    return  {
+        update_side_bar
+    }
+}())

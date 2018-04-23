@@ -10,6 +10,7 @@ function MapController() {
     this.minCountyPop = 100;
     this.leftColor = "white";
     this.rightColor = "red";
+    this.currentlySelectedStateId = null;
     this.init = function() {
         // Load data for states right at the beginning
         loadStates(filter.statName).then(
@@ -84,6 +85,7 @@ function MapController() {
             function(event) {
                 this.currYear = event.detail;
                 this.updateMap();
+                this.updateSideBar(this.currentlySelectedStateId);
             }.bind(this)
         );
 
@@ -91,9 +93,29 @@ function MapController() {
             "StatChanged",
             function(event) {
                 this.updateMap(true);
+                this.updateSideBar(this.currentlySelectedStateId);
+            }.bind(this)
+        );
+        window.addEventListener(
+            "SelectionChanged",
+            function(event) {
+                this.currentlySelectedStateId = event.detail
+                this.updateSideBar(this.currentlySelectedStateId);
             }.bind(this)
         );
     };
+    this.updateSideBar = function(selectedStateId) {
+        var elements;
+        var title;
+        if (selectedStateId) {
+            elements = this.getCountiesInState(selectedStateId);
+            title = this.states[parseInt(selectedStateId)].name;
+        } else {
+            elements = this.statesToArray();
+            title = 'United States';
+        }
+        side_bar.update_side_bar(title, elements, filter.shouldShowPercentage || filter.shouldFindPercentage);
+    }
     // Updates the map. Call this when some data has changed
     this.updateMap = function(stat_change = false) {
         var cb = function() {
@@ -171,6 +193,15 @@ function MapController() {
         id = parseInt(id);
         return this.states[parseInt(id)];
     };
+    this.statesToArray = function() {
+        var states = []
+        for (stateId in this.states) {
+            if (this.states.hasOwnProperty(stateId)) {
+                states.push(this.states[stateId]);
+            }
+        }
+        return states;
+    }
     // Returns the county with the given id if it exists
     this.getCounty = function(id) {
         id = parseInt(id);
@@ -180,6 +211,17 @@ function MapController() {
             return { name: "unknown", value: -1 };
         }
         return this.counties[id];
+    };
+    // Returns the counties of the state with the given id if it exists
+    this.getCountiesInState = function(stateId) {
+        stateId = '' + parseInt(stateId);
+        var countiesInState = [];
+        for (countyId in this.counties) {
+            if (this.counties.hasOwnProperty(countyId) && countyId.startsWith(stateId)) {
+                countiesInState.push(this.counties[countyId]);
+            }
+        }
+        return countiesInState;
     };
     // Updates the value for each state based on the currYear
     // Also updates minPop and maxPop for states

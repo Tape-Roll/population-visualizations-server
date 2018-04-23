@@ -213,7 +213,6 @@ var mapVisualization = (function() {
                 selection.attr("filter", "drop-shadow(0px 0px 10px)");
             })
             .on("mouseout", function(d) {
-                console.log("hello");
                 var selection = svg.select("#path" + d.id);
                 selection.attr("filter", null);
             })
@@ -227,6 +226,7 @@ var mapVisualization = (function() {
                     zoomIntoState(d, svg);
                     currentZoomedInState = d;
                     getCountyDataFunction(d.id).then(function(countyDataFunction) {
+                        window.dispatchEvent(new CustomEvent("SelectionChanged", { detail: currentZoomedInState.id }));
                         renderCountiesForStateOnSVG(
                             d.id,
                             geographyData,
@@ -234,6 +234,7 @@ var mapVisualization = (function() {
                                 resetNode("counties");
                                 zoomOut(d, svg);
                                 currentZoomedInState = null;
+                                window.dispatchEvent(new CustomEvent("SelectionChanged", { detail: null }));
                             },
                             countyDataFunction
                         );
@@ -295,18 +296,6 @@ var mapVisualization = (function() {
         mouseoverFormatter = func;
     };
 
-	var addCommas = function(nStr) {
-		nStr += '';
-		var x = nStr.split('.');
-		var x1 = x[0];
-		var x2 = x.length > 1 ? '.' + x[1] : '';
-		var rgx = /(\d+)(\d{3})/;
-		while (rgx.test(x1)) {
-			x1 = x1.replace(rgx, '$1' + ',' + '$2');
-		}
-		return x1 + x2;
-	}
-
     var setMouseoverFormatterPercent = function(usePercent) {
         if (usePercent) {
             mouseoverFormatter = function(val, id) {
@@ -321,7 +310,7 @@ var mapVisualization = (function() {
                 if (number < 0) {
                     return nameString + ' Unknown';
                 }
-                return nameString + ' ' + addCommas(unformattedNumberString);
+                return nameString + ' ' + formatter.addCommas(unformattedNumberString);
             };
         }
     };
