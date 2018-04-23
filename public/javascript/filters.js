@@ -129,7 +129,7 @@ function run() {
     }
 
     console.log(statSelected);
-    filter.statName = statSelected;
+    filter.statName = statSelected.trim();
 
     window.dispatchEvent(new CustomEvent("StatChanged", { detail: filter }));
 }
