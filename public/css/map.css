@@ -54,6 +54,10 @@
     overflow: auto;
 }
 
+.sort-header {
+    cursor: pointer;
+}
+
 #close-button {
     margin: 10px;
 }

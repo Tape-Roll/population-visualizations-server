@@ -13,6 +13,8 @@ var nextFilter = {
     shouldShowPercentage: false
 };
 
+var autoSwitch = false;
+
 $(function() {
     $dropDown1 = getDropDown("#drop1");
     $dropDown1.selectedStat = "total_pop";
@@ -137,7 +139,9 @@ function finalCategory(primaryFilterObj, secondaryFilterObj = {}, thirdFilterObj
         nextFilter.shouldFindPercentage = false;
     }
 
-    console.log(nextFilter);
+    if (autoSwitch) {
+        run();
+    }
 }
 
 function clear() {
