@@ -263,6 +263,7 @@ var mapVisualization = (function() {
             .selectAll("path")
             .attr("fill", function(d) {
                 if (currentZoomedInState !== null && currentZoomedInState.id === d.id) {
+                    d.prevFill = colorPath(pathDataFunction, d);
                     return "none";
                 } else {
                     return colorPath(pathDataFunction, d);
