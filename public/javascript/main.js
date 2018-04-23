@@ -24,6 +24,9 @@ function MapController() {
                         .range([this.leftColor, this.rightColor])
                 );
 
+                // Setup side bar initially
+                this.updateSideBar(this.currentlySelectedStateId);
+
                 // Set up tool tip
                 mapVisualization.setMouseoverFormatterPercent(
                     filter.shouldFindPercentage || filter.shouldShowPercentage
