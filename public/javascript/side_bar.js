@@ -9,9 +9,11 @@ $(function() {
         if ($side_bar.shown) {
             var pos = $side_bar.width() - $close_button.outerWidth(true);
             $side_bar_cont.css("left", -pos + "px");
+            $side_bar.css("overflow", "hidden");
             $close_button.html(' <i class="fas fa-angle-double-right"></i>');
         } else {
             $side_bar_cont.css("left", 0 + "px");
+            $side_bar.css("overflow", "auto");
             $close_button.html(' <i class="fas fa-angle-double-left"></i>');
         }
         $side_bar.shown = !$side_bar.shown;
@@ -31,9 +33,9 @@ var side_bar = (function() {
         for (var i = 0; i < data.length; i++) {
             var element = data[i];
             tableHtml +=
-                "<tr><td>" +
+                '<tr scope="row"><th>' +
                 element.name +
-                "</td><td>" +
+                "</th><td>" +
                 (showPercentage
                     ? element.value.toFixed(4) + "%"
                     : formatter.addCommas(element.value)) +

@@ -48,10 +48,10 @@
 }
 
 .side-bar {
-    width: 20vw;
+    width: 22vw;
     height: 100vh;
     margin-left: 0;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 #close-button {
@@ -60,6 +60,7 @@
 
 .side-bar-contents {
     padding: 10px 30px;
+    padding-right: 60px;
 }
 
 .map-div {
