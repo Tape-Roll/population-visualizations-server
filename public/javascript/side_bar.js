@@ -43,7 +43,7 @@ var side_bar = (function() {
 
     var rows = [];
 
-    var update_side_bar = function(title, data, showPercentage, isYear) {
+    var update_side_bar = function(title, data, showPercentage, shouldntChangeFilter) {
         console.log("Updating the side bar!");
         console.log("Title:" + title);
         console.log(data);
@@ -51,7 +51,7 @@ var side_bar = (function() {
         $side_bar_tbody.html("");
         rows = [];
 
-        if (!isYear) {
+        if (!shouldntChangeFilter) {
             $side_area_header.sortIcon.addClass(sortDesc);
             $side_area_header.sortIcon.removeClass(sortAsc);
             $side_area_header.sortIcon.removeClass("text-muted");
@@ -83,7 +83,7 @@ var side_bar = (function() {
                     "</td></tr>"
             });
         }
-        if (isYear) {
+        if (shouldntChangeFilter) {
             sortItems();
         }
         sideBarFromRows();

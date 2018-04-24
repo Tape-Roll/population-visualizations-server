@@ -88,7 +88,7 @@ function MapController() {
             function(event) {
                 this.currYear = event.detail;
                 this.updateMap();
-                this.updateSideBar(this.currentlySelectedStateId, true);
+                this.updateSideBar(this.currentlySelectedStateId);
             }.bind(this)
         );
 
@@ -97,7 +97,7 @@ function MapController() {
             function(event) {
                 this.updateMap(
                     function() {
-                        this.updateSideBar(this.currentlySelectedStateId);
+                        this.updateSideBar(this.currentlySelectedStateId, false);
                     }.bind(this),
                     true
                 );
@@ -111,7 +111,7 @@ function MapController() {
             }.bind(this)
         );
     };
-    this.updateSideBar = function(selectedStateId, isYear = false) {
+    this.updateSideBar = function(selectedStateId, change = true) {
         var elements;
         var title;
         if (selectedStateId) {
@@ -125,7 +125,7 @@ function MapController() {
             title,
             elements,
             filter.shouldShowPercentage || filter.shouldFindPercentage,
-            isYear
+            change
         );
     };
     // Updates the map. Call this when some data has changed
