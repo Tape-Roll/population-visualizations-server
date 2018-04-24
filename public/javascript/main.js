@@ -8,7 +8,7 @@ function MapController() {
     this.minStateValue = 100;
     this.maxCountyPop = 0;
     this.minCountyPop = 100;
-    this.leftColor = "#ffffCC";
+    this.leftColor = "#ffffDE";
     this.rightColor = "#AA0000";
     this.currentlySelectedStateId = null;
     this.init = function() {
@@ -282,6 +282,7 @@ function MapController() {
         if (filter.shouldFindPercentage) {
             this.maxStateValue = 0;
             this.minStateValue = 100;
+            console.log(this.states);
             Object.keys(this.states).forEach(
                 function(key) {
                     this.getState(key).value /=
@@ -322,7 +323,10 @@ function MapController() {
             Object.keys(this.counties).forEach(
                 function(key) {
                     var value = 0;
-                    if (this.getCounty(key).years[this.currYear] === undefined) {
+                    if (
+                        this.getCounty(key).years === undefined ||
+                        this.getCounty(key).years[this.currYear] === undefined
+                    ) {
                         value = -1;
                     } else {
                         value = parseFloat(this.findValue(this.getCounty(key)));
