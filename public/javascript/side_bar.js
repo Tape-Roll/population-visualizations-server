@@ -43,7 +43,7 @@ var side_bar = (function() {
 
     var rows = [];
 
-    var update_side_bar = function(title, data, showPercentage) {
+    var update_side_bar = function(title, data, showPercentage, isYear) {
         console.log("Updating the side bar!");
         console.log("Title:" + title);
         console.log(data);
@@ -51,16 +51,22 @@ var side_bar = (function() {
         $side_bar_tbody.html("");
         rows = [];
 
-        $side_area_header.sortIcon.addClass(sortDesc);
-        $side_area_header.sortIcon.removeClass(sortAsc);
-        $side_area_header.sortIcon.removeClass("text-muted");
+        if (!isYear) {
+            $side_area_header.sortIcon.addClass(sortDesc);
+            $side_area_header.sortIcon.removeClass(sortAsc);
+            $side_area_header.sortIcon.removeClass("text-muted");
 
-        $side_stat_header.sortIcon.addClass(sortAsc);
-        $side_stat_header.sortIcon.removeClass(sortDesc);
-        $side_stat_header.sortIcon.addClass("text-muted");
+            $side_stat_header.sortIcon.addClass(sortAsc);
+            $side_stat_header.sortIcon.removeClass(sortDesc);
+            $side_stat_header.sortIcon.addClass("text-muted");
 
-        $side_area_header.sorted = 1;
-        $side_stat_header.sorted = 0;
+            $side_area_header.sorted = 1;
+            $side_stat_header.sorted = 0;
+        }
+
+        if (mapVisualization.getCurrentlyZoomedInStateId() !== null) {
+        } else {
+        }
 
         for (var i = 0; i < data.length; i++) {
             var element = data[i];
@@ -76,6 +82,9 @@ var side_bar = (function() {
                         : formatter.addCommas(element.value)) +
                     "</td></tr>"
             });
+        }
+        if (isYear) {
+            sortItems();
         }
         sideBarFromRows();
     };
@@ -97,9 +106,7 @@ var side_bar = (function() {
         $side_area_header.sortIcon.addClass("text-muted");
         $side_area_header.sorted = 0;
 
-        rows.sort(function(a, b) {
-            return $side_stat_header.sorted * (b.value - a.value);
-        });
+        sortItems();
         sideBarFromRows();
     });
 
@@ -120,9 +127,7 @@ var side_bar = (function() {
         $side_stat_header.sortIcon.addClass("text-muted");
         $side_stat_header.sorted = 0;
 
-        rows.sort(function(a, b) {
-            return $side_area_header.sorted * a.areaName.localeCompare(b.areaName);
-        });
+        sortItems();
         sideBarFromRows();
     });
 
@@ -134,6 +139,19 @@ var side_bar = (function() {
         });
 
         $side_bar_tbody.html(tableHtml);
+    };
+
+    var sortItems = function() {
+        console.log($side_area_header.sorted);
+        if ($side_stat_header.sorted !== 0) {
+            rows.sort(function(a, b) {
+                return $side_stat_header.sorted * (b.value - a.value);
+            });
+        } else {
+            rows.sort(function(a, b) {
+                return $side_area_header.sorted * a.areaName.localeCompare(b.areaName);
+            });
+        }
     };
 
     return {

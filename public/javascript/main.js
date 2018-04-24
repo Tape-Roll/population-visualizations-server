@@ -8,8 +8,8 @@ function MapController() {
     this.minStateValue = 100;
     this.maxCountyPop = 0;
     this.minCountyPop = 100;
-    this.leftColor = "white";
-    this.rightColor = "red";
+    this.leftColor = "#ffffCC";
+    this.rightColor = "#AA0000";
     this.currentlySelectedStateId = null;
     this.init = function() {
         // Load data for states right at the beginning
@@ -88,7 +88,7 @@ function MapController() {
             function(event) {
                 this.currYear = event.detail;
                 this.updateMap();
-                this.updateSideBar(this.currentlySelectedStateId);
+                this.updateSideBar(this.currentlySelectedStateId, true);
             }.bind(this)
         );
 
@@ -111,7 +111,7 @@ function MapController() {
             }.bind(this)
         );
     };
-    this.updateSideBar = function(selectedStateId) {
+    this.updateSideBar = function(selectedStateId, isYear = false) {
         var elements;
         var title;
         if (selectedStateId) {
@@ -124,7 +124,8 @@ function MapController() {
         side_bar.update_side_bar(
             title,
             elements,
-            filter.shouldShowPercentage || filter.shouldFindPercentage
+            filter.shouldShowPercentage || filter.shouldFindPercentage,
+            isYear
         );
     };
     // Updates the map. Call this when some data has changed

@@ -291,7 +291,7 @@ var mapVisualization = (function() {
 
     // Will be null if not zoomed in
     var getCurrentlyZoomedInStateId = function() {
-        if (currentZoomedInState === null) {
+        if (currentZoomedInState === undefined || currentZoomedInState === null) {
             return null;
         }
         return currentZoomedInState.id;
