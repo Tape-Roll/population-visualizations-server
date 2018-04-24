@@ -149,12 +149,13 @@ function MapController() {
                     .range([this.leftColor, this.rightColor])
             );
 
+            console.log(this.minCountyValue, this.maxCountyValue);
+
             mapVisualization.recolorMap(
                 function(id) {
                     var ret = this.getState(id);
                     if (ret === undefined) {
                         ret = this.getCounty(id);
-                    } else {
                     }
 
                     return ret;
@@ -246,6 +247,7 @@ function MapController() {
         this.minStateValue = 10000000000;
         var total = 0;
         if (stateArray !== undefined) {
+            this.states = {};
             stateArray.forEach(
                 function(element) {
                     var value = parseFloat(this.findValue(element));
@@ -298,6 +300,7 @@ function MapController() {
         this.minCountyValue = 10000000000;
         var total = 0;
         if (countyArray !== undefined) {
+            this.counties = {};
             try {
                 countyArray.forEach(
                     function(element) {
@@ -306,6 +309,7 @@ function MapController() {
                         element.value = pop;
                         total += pop;
                         if (pop >= 0) {
+                            console.log("Here");
                             this.minCountyValue = Math.min(pop, this.minCountyValue);
                             this.maxCountyValue = Math.max(pop, this.maxCountyValue);
                         }
@@ -326,6 +330,8 @@ function MapController() {
                     this.getCounty(key).value = value;
                     total += value;
                     if (value >= 0) {
+                        console.log(this.counties[key], value);
+
                         this.minCountyValue = Math.min(value, this.minCountyValue);
                         this.maxCountyValue = Math.max(value, this.maxCountyValue);
                     }
@@ -345,6 +351,7 @@ function MapController() {
                             this.getCounty(key).value,
                             this.minCountyValue
                         );
+                        console.log("Dnot");
                         this.maxCountyValue = Math.max(
                             this.getCounty(key).value,
                             this.maxCountyValue
