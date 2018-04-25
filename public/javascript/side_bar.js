@@ -1,23 +1,43 @@
 // Called whenever jquery is ready
 $(function() {
     var $side_bar_cont = $(".side-bar-cont");
+    var $filter_cont = $(".filter-cont");
+    var $time_cont = $(".time-cont");
     var $side_bar = $side_bar_cont.children(".side-bar");
     $side_bar.shown = true;
     var $close_button = $("#close-button");
+    var $svg = $('svg')
 
     $close_button.on("click", function(event) {
         if ($side_bar.shown) {
-            var pos = $side_bar.width() - $close_button.outerWidth(true);
-            $side_bar_cont.css("left", -pos + "px");
-            $side_bar.css("overflow", "hidden");
-            $close_button.html(' <i class="fas fa-angle-double-right"></i>');
+            hide_side_bar();
         } else {
-            $side_bar_cont.css("left", 0 + "px");
-            $side_bar.css("overflow", "auto");
-            $close_button.html(' <i class="fas fa-angle-double-left"></i>');
+            expand_side_bar();
         }
-        $side_bar.shown = !$side_bar.shown;
     });
+
+    var hide_side_bar = function() {
+        var pos = $side_bar.width() - $close_button.outerWidth(true);
+        $side_bar_cont.css("left", -pos + "px");
+        $side_bar.css("overflow", "hidden");
+        $close_button.html(' <i class="fas fa-angle-double-right"></i>');
+        $svg.css('left', '0')
+        $filter_cont.css('left', '0')
+        $time_cont.css('left', '0')
+        $side_bar.shown = false;
+    }
+
+    var expand_side_bar = function() {
+        $side_bar_cont.css("left", 0 + "px");
+        $side_bar.css("overflow", "auto");
+        $close_button.html(' <i class="fas fa-angle-double-left"></i>');
+        $svg.css('left', '10vw')
+        $filter_cont.css('left', '10vw')
+        $filter_cont.css('overflow', 'hidden')
+        $time_cont.css('left', '10vw')
+        $time_cont.css('overflow', 'hidden')
+        $side_bar.shown = true;
+    }
 });
 
 var sortDesc = "fa-angle-up";

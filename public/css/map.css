@@ -5,6 +5,11 @@
     z-index: 1;
 }
 
+body {
+  width: 100vw;
+  overflow: hidden;
+}
+
 .cont {
     width: 100vw;
     height: 100vh;
@@ -12,12 +17,14 @@
 }
 
 .filter-cont {
+    transition: 200ms left ease;
     position: absolute;
     top: 0;
-    left: 0;
+    left: 10vw;
+    overflow: hidden;
+    width: 100vw;
     display: flex;
     justify-content: center;
-    width: 100vw;
 }
 
 .filter-div {
@@ -79,16 +86,21 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
 .map-cont {
     z-index: 0;
+    overflow: hidden;
 }
 
 .time-cont {
+    transition: 200ms left ease;
     position: absolute;
     bottom: 20px;
     width: 100vw;
+    left: 10vw;
+    overflow: hidden;
     display: flex;
     justify-content: center;
 }
@@ -97,11 +109,13 @@
     display: flex;
     align-items: center;
     padding: 10px 30px;
+    overflow: hidden;
 }
 
 #slider {
     width: 400px;
     margin: 20px;
+    overflow: hidden;
 }
 
 .year-label {
@@ -125,10 +139,12 @@
 svg {
     position: fixed;
     top: 0;
-    left: 0;
+    left: 10vw;
+    overflow: hidden;
     height: 100%;
     width: 100%;
     z-index: 0;
+    transition: 200ms left ease;
 }
 
 .side-bar td {
@@ -136,6 +152,5 @@ svg {
 }
 
 #side-bar-table-cont {
-    /* overflow-y: scroll; */
     max-height: 90vh;
 }
