@@ -19,7 +19,7 @@ $(function() {
     var hide_side_bar = function() {
         var pos = $side_bar.width() - $close_button.outerWidth(true);
         $side_bar_cont.css("left", -pos + "px");
-        $side_bar.css("overflow", "hidden");
+        $side_bar.css("overflow-x", "hidden");
         $close_button.html(' <i class="fas fa-angle-double-right"></i>');
         $svg.css('left', '0')
         $filter_cont.css('left', '0')
@@ -29,13 +29,13 @@ $(function() {
 
     var expand_side_bar = function() {
         $side_bar_cont.css("left", 0 + "px");
-        $side_bar.css("overflow", "auto");
+        $side_bar.css("overflow-x", "auto");
         $close_button.html(' <i class="fas fa-angle-double-left"></i>');
         $svg.css('left', '10vw')
         $filter_cont.css('left', '10vw')
-        $filter_cont.css('overflow', 'hidden')
+        $filter_cont.css('overflow-x', 'hidden')
         $time_cont.css('left', '10vw')
-        $time_cont.css('overflow', 'hidden')
+        $time_cont.css('overflow-x', 'hidden')
         $side_bar.shown = true;
     }
 });

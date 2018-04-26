@@ -7,13 +7,13 @@
 
 body {
   width: 100vw;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .cont {
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .filter-cont {
@@ -21,7 +21,6 @@ body {
     position: absolute;
     top: 0;
     left: 10vw;
-    overflow: hidden;
     width: 100vw;
     display: flex;
     justify-content: center;
@@ -59,7 +58,7 @@ body {
     height: 100vh;
     box-sizing: border-box;
     margin-left: 0;
-    overflow: auto;
+    overflow-x: auto;
 }
 
 .sort-header {
@@ -86,12 +85,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .map-cont {
     z-index: 0;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .time-cont {
@@ -100,7 +99,7 @@ body {
     bottom: 20px;
     width: 100vw;
     left: 10vw;
-    overflow: hidden;
+    overflow-x: hidden;
     display: flex;
     justify-content: center;
 }
@@ -109,13 +108,13 @@ body {
     display: flex;
     align-items: center;
     padding: 10px 30px;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 #slider {
     width: 400px;
     margin: 20px;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .year-label {
@@ -140,7 +139,7 @@ svg {
     position: fixed;
     top: 0;
     left: 10vw;
-    overflow: hidden;
+    overflow-x: hidden;
     height: 100%;
     width: 100%;
     z-index: 0;
