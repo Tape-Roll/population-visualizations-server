@@ -33,9 +33,7 @@ $(function() {
         $close_button.html(' <i class="fas fa-angle-double-left"></i>');
         $svg.css('left', '10vw')
         $filter_cont.css('left', '10vw')
-        $filter_cont.css('overflow-x', 'hidden')
         $time_cont.css('left', '10vw')
-        $time_cont.css('overflow-x', 'hidden')
         $side_bar.shown = true;
     }
 });
